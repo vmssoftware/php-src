@@ -27,7 +27,9 @@
 #include "win32/param.h"
 #include "win32/winutil.h"
 #else
+#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
+#endif
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>

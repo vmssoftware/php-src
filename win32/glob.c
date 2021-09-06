@@ -76,7 +76,9 @@
 
 #include <ctype.h>
 #ifndef PHP_WIN32
+#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
+#endif
 #include <dirent.h>
 #include <pwd.h>
 #include <unistd.h>

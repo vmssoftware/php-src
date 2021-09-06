@@ -64,7 +64,9 @@
 #define SLJIT_PROT_WX PROT_MPROTECT(PROT_EXEC)
 #else /* !PROT_MPROTECT */
 #ifdef _NETBSD_SOURCE
+#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
+#endif
 #else /* !_NETBSD_SOURCE */
 typedef unsigned int	u_int;
 #define devmajor_t sljit_s32

@@ -23,7 +23,11 @@
 
 #include <stdio.h>
 
+#ifdef __VMS
+#include "TSRM.h"
+#else
 #include "../TSRM/TSRM.h"
+#endif
 #include "zend.h"
 
 #ifndef ZEND_MM_ALIGNMENT

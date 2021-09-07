@@ -13,13 +13,13 @@ MMS/EXT/DESCR=phplib_ereg.mms/MACRO=( -
 ############################################################################
 # Compiler flags combination
 ############################################################################
-CC_DEFINES = $(CC_DEFINES),-
+CC_DEFINES_INNER = $(CC_DEFINES),-
 "regexec"="php_regexec",-
 "regerror"="php_regerror",-
 "regfree"="php_regfree",-
 "regcomp"="php_regcomp"
 
-CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLUDES))
+CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES_INNER))/INCLUDE_DIRECTORY=($(CC_INCLUDES))
 
 ############################################################################
 # First

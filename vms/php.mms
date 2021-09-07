@@ -100,7 +100,7 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
         "HEADERS=$(HEADERS)" -
     )
 
-.EXE.OLB
+.MMS.EXE
     @ ! use the '-' symbol bacause of bug in MMS while updating library
     - $(MMS)/DESCR=$(MMS$SOURCE)/MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
@@ -125,6 +125,7 @@ HEADERS = -
 TARGET : -
 $(HEADERS) -
 [.$(OUT_DIR)]phplib_date.olb -
+[.$(OUT_DIR)]phplib_pcre.olb -
 [.$(OUT_DIR)]libxml.olb -
 ![.$(OUT_DIR)]bcmath.exe
     ! target built
@@ -145,6 +146,11 @@ $(HEADERS) -
 # phplib_date
 ############################################################################
 [.$(OUT_DIR)]phplib_date.olb : [.vms.mms]phplib_date.mms
+
+############################################################################
+# phplib_pcre
+############################################################################
+[.$(OUT_DIR)]phplib_pcre.olb : [.vms.mms]phplib_pcre.mms
 
 ############################################################################
 # libxml

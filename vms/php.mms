@@ -87,16 +87,29 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
 # Suffixes and rules
 ############################################################################
 .SUFFIXES
-.SUFFIXES .EXE .OLB .OBJ .C
+.SUFFIXES .EXE .OLB .MMS
 
-.C.OBJ
-    @ pipe create/dir $(DIR $(MMS$TARGET)) | copy SYS$INPUT nl:
-    $(CC) $(CC_FLAGS) /OBJECT=$(MMS$TARGET) $(MMS$SOURCE)
+.MMS.OLB
+    @ ! use the '-' symbol bacause of bug in MMS while updating library
+    - $(MMS)/DESCR=$(MMS$SOURCE)/MACRO=( -
+        "OUT_DIR=$(OUT_DIR)", -
+        "OBJ_DIR=$(OBJ_DIR)", -
+        "CC_QUALIFIERS=$(CC_QUALIFIERS)", -
+        "CC_DEFINES=$(CC_DEFINES)", -
+        "CC_INCLUDES=$(CC_INCLUDES)", -
+        "HEADERS=$(HEADERS)" -
+    )
 
-.OBJ.OLB
-    @ pipe create/dir $(DIR $(MMS$TARGET)) | copy SYS$INPUT nl:
-    @ IF F$SEARCH("$(MMS$TARGET)") .EQS. "" THEN $(LIBR)/CREATE $(MMS$TARGET)
-    $(LIBR) $(MMS$TARGET) $(MMS$SOURCE)
+.EXE.OLB
+    @ ! use the '-' symbol bacause of bug in MMS while updating library
+    - $(MMS)/DESCR=$(MMS$SOURCE)/MACRO=( -
+        "OUT_DIR=$(OUT_DIR)", -
+        "OBJ_DIR=$(OBJ_DIR)", -
+        "CC_QUALIFIERS=$(CC_QUALIFIERS)", -
+        "CC_DEFINES=$(CC_DEFINES)", -
+        "CC_INCLUDES=$(CC_INCLUDES)", -
+        "HEADERS=$(HEADERS)" -
+    )
 
 ############################################################################
 # H
@@ -104,7 +117,6 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
 HEADERS = -
 [.main]php_config.h -
 [.zend]zend_config.h -
-[.ext.date.lib]timelib_config.h -
 [.main]build-defs.h
 
 ############################################################################
@@ -112,7 +124,9 @@ HEADERS = -
 ############################################################################
 TARGET : -
 $(HEADERS) -
-[.$(OUT_DIR)]phplib_date.olb
+[.$(OUT_DIR)]phplib_date.olb -
+[.$(OUT_DIR)]libxml.olb -
+![.$(OUT_DIR)]bcmath.exe
     ! target built
 
 ############################################################################
@@ -130,16 +144,17 @@ $(HEADERS) -
 ############################################################################
 # phplib_date
 ############################################################################
-[.$(OUT_DIR)]phplib_date.olb : 
-    @ ! use the '-' symbol bacause of bug in MMS while updating library
-    - $(MMS)/DESCR=[.vms.mms]date.mms/MACRO=( -
-        "OUT_DIR=$(OUT_DIR)", -
-        "OBJ_DIR=$(OBJ_DIR)", -
-        "CC_QUALIFIERS=$(CC_QUALIFIERS)", -
-        "CC_DEFINES=$(CC_DEFINES)", -
-        "CC_INCLUDES=$(CC_INCLUDES)", -
-        "HEADERS=$(HEADERS)" -
-    )
+[.$(OUT_DIR)]phplib_date.olb : [.vms.mms]phplib_date.mms
+
+############################################################################
+# libxml
+############################################################################
+[.$(OUT_DIR)]libxml.olb : [.vms.mms]libxml.mms
+
+############################################################################
+# bcmath
+############################################################################
+[.$(OUT_DIR)]bcmath.exe : [.vms.mms]bcmath.mms
 
 ############################################################################
 CLEAN :

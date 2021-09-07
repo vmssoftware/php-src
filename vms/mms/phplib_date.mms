@@ -1,6 +1,6 @@
 ############################################################################
 # -
-MMS/EXT/DESCR=date.mms/MACRO=( -
+MMS/EXT/DESCR=phplib_date.mms/MACRO=( -
     "OUT_DIR=...", -
     "OBJ_DIR=...", -
     "CC_QUALIFIERS=...", -
@@ -54,7 +54,7 @@ HEADERS = $(HEADERS) [.ext.date.lib]timelib_config.h
 ############################################################################
 # Object files
 ############################################################################
-PHPLIB_DATE_OBJ = -
+OBJ_FILES = -
 [.$(OBJ_DIR).ext.date]php_date.obj -
 [.$(OBJ_DIR).ext.date.lib]astro.obj -
 [.$(OBJ_DIR).ext.date.lib]dow.obj -
@@ -65,9 +65,9 @@ PHPLIB_DATE_OBJ = -
 [.$(OBJ_DIR).ext.date.lib]parse_tz.obj -
 [.$(OBJ_DIR).ext.date.lib]timelib.obj -
 [.$(OBJ_DIR).ext.date.lib]tm2unixtime.obj -
-[.$(OBJ_DIR).ext.date.lib]unixtime2tm.obj -
+[.$(OBJ_DIR).ext.date.lib]unixtime2tm.obj
 
-[.$(OUT_DIR)]phplib_date.olb : [.$(OUT_DIR)]phplib_date.olb($(PHPLIB_DATE_OBJ))
+[.$(OUT_DIR)]phplib_date.olb : [.$(OUT_DIR)]phplib_date.olb($(OBJ_FILES))
     continue
 
 ############################################################################

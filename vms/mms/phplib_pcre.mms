@@ -1,20 +1,8 @@
 ############################################################################
-# -
-MMS/EXT/DESCR=phplib_pcre.mms/MACRO=( -
-    "OUT_DIR=...", -
-    "OBJ_DIR=...", -
-    "CC_QUALIFIERS=...", -
-    "CC_DEFINES=...", -
-    "CC_INCLUDES=...", -
-    "LINK_FLAGS=..." -
-)
+# Must be invoked from php.mms
 ############################################################################
 
-############################################################################
-# Compiler flags combination
-############################################################################
-CC_DEFINES_INNER = $(CC_DEFINES),PCRE2_CODE_UNIT_WIDTH=8,HAVE_CONFIG_H
-CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES_INNER))/INCLUDE_DIRECTORY=($(CC_INCLUDES))
+CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLUDES))
 
 ############################################################################
 # First
@@ -26,27 +14,10 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES_INNER))/INCLUDE_DIRECTORY=($(CC
     @ pipe create/dir [.$(OBJ_DIR).ext.pcre.pcre2lib] | copy SYS$INPUT nl:
 
 ############################################################################
-# Suffixes and rules
-############################################################################
-.SUFFIXES
-.SUFFIXES .OLB .OBJ .C
-
-.C.OBJ
-    $(CC) $(CC_FLAGS) /OBJECT=$(MMS$TARGET) $(MMS$SOURCE)
-
-.OBJ.OLB
-    @ IF F$SEARCH("$(MMS$TARGET)") .EQS. "" THEN $(LIBR)/CREATE $(MMS$TARGET)
-    $(LIBR) $(MMS$TARGET) $(MMS$SOURCE)
-
-############################################################################
-# Target
+# Main target
 ############################################################################
 TARGET : [.$(OUT_DIR)]phplib_pcre.olb
     ! phplib_pcre is built
-
-############################################################################
-# H
-############################################################################
 
 ############################################################################
 # Object files
@@ -81,6 +52,9 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.pcre.pcre2lib]pcre2_valid_utf.obj -
 [.$(OBJ_DIR).ext.pcre.pcre2lib]pcre2_xclass.obj
 
+############################################################################
+# Main target rule
+############################################################################
 [.$(OUT_DIR)]phplib_pcre.olb : [.$(OUT_DIR)]phplib_pcre.olb($(OBJ_FILES))
     continue
 

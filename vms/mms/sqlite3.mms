@@ -1,17 +1,5 @@
 ############################################################################
-# -
-MMS/EXT/DESCR=sqlite3.mms/MACRO=( -
-    "OUT_DIR=...", -
-    "OBJ_DIR=...", -
-    "CC_QUALIFIERS=...", -
-    "CC_DEFINES=...", -
-    "CC_INCLUDES=...", -
-    "LINK_FLAGS=..." -
-)
-############################################################################
-
-############################################################################
-# Compiler flags combination
+# Must be invoked from php.mms
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLUDES),oss$root:[include])
@@ -25,27 +13,10 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
     @ pipe create/dir [.$(OBJ_DIR).ext.sqlite3] | copy SYS$INPUT nl:
 
 ############################################################################
-# Suffixes and rules
-############################################################################
-.SUFFIXES
-.SUFFIXES .OLB .OBJ .C
-
-.C.OBJ
-    $(CC) $(CC_FLAGS) /OBJECT=$(MMS$TARGET) $(MMS$SOURCE)
-
-.OBJ.OLB
-    @ IF F$SEARCH("$(MMS$TARGET)") .EQS. "" THEN $(LIBR)/CREATE $(MMS$TARGET)
-    $(LIBR) $(MMS$TARGET) $(MMS$SOURCE)
-
-############################################################################
-# Target
+# Main target
 ############################################################################
 TARGET : [.$(OUT_DIR)]sqlite3.olb
     ! sqlite3 is built
-
-############################################################################
-# H
-############################################################################
 
 ############################################################################
 # Object files
@@ -53,6 +24,9 @@ TARGET : [.$(OUT_DIR)]sqlite3.olb
 OBJ_FILES = -
 [.$(OBJ_DIR).ext.sqlite3]sqlite3.obj
 
+############################################################################
+# Main target rule
+############################################################################
 [.$(OUT_DIR)]sqlite3.olb : [.$(OUT_DIR)]sqlite3.olb($(OBJ_FILES))
     continue
 

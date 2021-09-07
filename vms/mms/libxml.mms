@@ -1,17 +1,5 @@
 ############################################################################
-# -
-MMS/EXT/DESCR=libxml.mms/MACRO=( -
-    "OUT_DIR=...", -
-    "OBJ_DIR=...", -
-    "CC_QUALIFIERS=...", -
-    "CC_DEFINES=...", -
-    "CC_INCLUDES=...", -
-    "LINK_FLAGS=..." -
-)
-############################################################################
-
-############################################################################
-# Compiler flags combination
+# Must be invoked from php.mms
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLUDES))
@@ -25,27 +13,10 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
     @ pipe create/dir [.$(OBJ_DIR).ext.libxml] | copy SYS$INPUT nl:
 
 ############################################################################
-# Suffixes and rules
-############################################################################
-.SUFFIXES
-.SUFFIXES .OLB .OBJ .C
-
-.C.OBJ
-    $(CC) $(CC_FLAGS) /OBJECT=$(MMS$TARGET) $(MMS$SOURCE)
-
-.OBJ.OLB
-    @ IF F$SEARCH("$(MMS$TARGET)") .EQS. "" THEN $(LIBR)/CREATE $(MMS$TARGET)
-    $(LIBR) $(MMS$TARGET) $(MMS$SOURCE)
-
-############################################################################
-# Target
+# Main target
 ############################################################################
 TARGET : [.$(OUT_DIR)]libxml.olb
     ! libxml is built
-
-############################################################################
-# H
-############################################################################
 
 ############################################################################
 # Object files
@@ -53,6 +24,9 @@ TARGET : [.$(OUT_DIR)]libxml.olb
 OBJ_FILES = -
 [.$(OBJ_DIR).ext.libxml]libxml.obj
 
+############################################################################
+# Main target rule
+############################################################################
 [.$(OUT_DIR)]libxml.olb : [.$(OUT_DIR)]libxml.olb($(OBJ_FILES))
     continue
 

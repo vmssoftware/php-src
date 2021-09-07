@@ -1,18 +1,7 @@
 ############################################################################
-# -
-MMS/EXT/DESCR=phplib_ereg.mms/MACRO=( -
-    "OUT_DIR=...", -
-    "OBJ_DIR=...", -
-    "CC_QUALIFIERS=...", -
-    "CC_DEFINES=...", -
-    "CC_INCLUDES=...", -
-    "LINK_FLAGS=..." -
-)
+# Must be invoked from php.mms
 ############################################################################
 
-############################################################################
-# Compiler flags combination
-############################################################################
 CC_DEFINES_INNER = $(CC_DEFINES),-
 "regexec"="php_regexec",-
 "regerror"="php_regerror",-
@@ -30,27 +19,10 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES_INNER))/INCLUDE_DIRECTORY=($(CC
     @ pipe create/dir [.$(OBJ_DIR).ext.ereg.regex] | copy SYS$INPUT nl:
 
 ############################################################################
-# Suffixes and rules
-############################################################################
-.SUFFIXES
-.SUFFIXES .OLB .OBJ .C
-
-.C.OBJ
-    $(CC) $(CC_FLAGS) /OBJECT=$(MMS$TARGET) $(MMS$SOURCE)
-
-.OBJ.OLB
-    @ IF F$SEARCH("$(MMS$TARGET)") .EQS. "" THEN $(LIBR)/CREATE $(MMS$TARGET)
-    $(LIBR) $(MMS$TARGET) $(MMS$SOURCE)
-
-############################################################################
-# Target
+# Main target
 ############################################################################
 TARGET : [.$(OUT_DIR)]phplib_ereg.olb
     ! phplib_ereg is built
-
-############################################################################
-# H
-############################################################################
 
 ############################################################################
 # Object files
@@ -61,6 +33,9 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.ereg.regex]regerror.obj -
 [.$(OBJ_DIR).ext.ereg.regex]regfree.obj
 
+############################################################################
+# Main target rule
+############################################################################
 [.$(OUT_DIR)]phplib_ereg.olb : [.$(OUT_DIR)]phplib_ereg.olb($(OBJ_FILES))
     continue
 

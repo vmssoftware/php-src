@@ -15,14 +15,14 @@ CC_QUALIFIERS = -
 # Compiler definitions
 ############################################################################
 CC_DEFINES = -
-_USE_STD_STAT, -                ! COMMON
-_POSIX_EXIT, -
-__STDC_FORMAT_MACROS, -
-_LARGEFILE, -
-_SOCKADDR_LEN, -
-HAVE_TIMELIB_CONFIG_H=1, -
-ZEND_ENABLE_STATIC_TSRMLS_CACHE=1, -
-PHP_ATOM_INC
+_USE_STD_STAT,-
+_POSIX_EXIT,-
+__STDC_FORMAT_MACROS,-
+_LARGEFILE,-
+_SOCKADDR_LEN,-
+ZEND_ENABLE_STATIC_TSRMLS_CACHE=1,-
+PHP_ATOM_INC,-
+PCRE2_CODE_UNIT_WIDTH=8
 
 ############################################################################
 # Output folder
@@ -91,7 +91,9 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
 
 .MMS.OLB
     @ ! use the '-' symbol bacause of bug in MMS while updating library
-    - $(MMS)/DESCR=$(MMS$SOURCE)/MACRO=( -
+    - $(MMS)/DESCR=$(MMS$SOURCE)-
+    /RULES=[.vms.mms]rules.mms-
+    /MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
         "OBJ_DIR=$(OBJ_DIR)", -
         "CC_QUALIFIERS=$(CC_QUALIFIERS)", -
@@ -102,7 +104,9 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
 
 .MMS.EXE
     @ ! use the '-' symbol bacause of bug in MMS while updating library
-    - $(MMS)/DESCR=$(MMS$SOURCE)/MACRO=( -
+    - $(MMS)/DESCR=$(MMS$SOURCE)-
+    /RULES=[.vms.mms]rules.mms-
+    /MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
         "OBJ_DIR=$(OBJ_DIR)", -
         "CC_QUALIFIERS=$(CC_QUALIFIERS)", -
@@ -130,6 +134,7 @@ $(HEADERS) -
 [.$(OUT_DIR)]sqlite3.olb -
 [.$(OUT_DIR)]ctype.olb -
 [.$(OUT_DIR)]dom.olb -
+[.$(OUT_DIR)]fileinfo.olb -
 ![.$(OUT_DIR)]bcmath.exe
     ! target built
 
@@ -174,6 +179,11 @@ $(HEADERS) -
 # ctype
 ############################################################################
 [.$(OUT_DIR)]ctype.olb : [.vms.mms]ctype.mms
+
+############################################################################
+# fileinfo
+############################################################################
+[.$(OUT_DIR)]fileinfo.olb : [.vms.mms]fileinfo.mms
 
 ############################################################################
 # bcmath

@@ -2,11 +2,10 @@
 # MMS/EXT/DESCR=php.mms/MACRO=("OUTDIR=OUT","CONFIG=DEBUG")
 ############################################################################
 
-
 ############################################################################
 # Compiler qualifiers
 ############################################################################
-CC_QUALIFIERS = -
+CC_QUALIFIERS_G = -
 /NAMES=(AS_IS,SHORTENED) -
 /WARNINGS=(WARNINGS=ALL, DISABLE=(EXTRASEMI,MACROREDEF,QUESTCOMPARE1,QUESTCOMPARE,UNSTRUCTMEM,DUPTYPESPEC)) -
 /ACCEPT=NOVAXC_KEYWORDS
@@ -14,7 +13,7 @@ CC_QUALIFIERS = -
 ############################################################################
 # Compiler definitions
 ############################################################################
-CC_DEFINES = -
+CC_DEFINES_G = -
 _USE_STD_STAT,-
 _POSIX_EXIT,-
 __STDC_FORMAT_MACROS,-
@@ -25,7 +24,24 @@ PHP_ATOM_INC,-
 PCRE2_CODE_UNIT_WIDTH=8
 
 ############################################################################
-# Output folder
+# Include folders
+############################################################################
+CC_INCLUDES_G = -
+[], -
+[.main], -
+[.tsrm], -
+[.zend]
+
+############################################################################
+# Headers
+############################################################################
+HEADERS_G = -
+[.main]php_config.h -
+[.zend]zend_config.h -
+[.main]build-defs.h
+
+############################################################################
+# Check output folder
 ############################################################################
 .IF OUTDIR
 .ELSE
@@ -33,55 +49,25 @@ OUTDIR = OUT
 .ENDIF
 
 ############################################################################
-# Configuration
+# Check configuration
 ############################################################################
 .IF CONFIG
 .ELSE
 CONFIG = DEBUG
 .ENDIF
 
-############################################################################
-# Debug/Relase
-############################################################################
 .IF $(FINDSTRING DEBUG, $(CONFIG)) .EQ DEBUG
-CC_QUALIFIERS = $(CC_QUALIFIERS)/DEBUG/NOOPTIMIZE/LIST=$(MMS$TARGET_NAME)/SHOW=ALL
-CC_DEFINES = $(CC_DEFINES),_DEBUG
-OUT_DIR = $(OUTDIR).$(CONFIG)
-OBJ_DIR = $(OUT_DIR).OBJ
-LINK_FLAGS = /NODEBUG/MAP=[.$(OUT_DIR)]$(NOTDIR $(MMS$TARGET_NAME))/TRACE/DSF=[.$(OUT_DIR)]$(NOTDIR $(MMS$TARGET_NAME)).DSF
-.ELSE
-CC_QUALIFIERS = $(CC_QUALIFIERS)/NODEBUG/OPTIMIZE/NOLIST
-CC_DEFINES = $(CC_DEFINES),_NDEBUG
-OUT_DIR = $(OUTDIR).$(CONFIG)
-OBJ_DIR = $(OUT_DIR).OBJ
-LINK_FLAGS = /NODEBUG/NOMAP/NOTRACEBACK
+IS_DEBUG=1
 .ENDIF
 
-############################################################################
-# Include folders
-############################################################################
-CC_INCLUDES = -
-[], -
-[.main], -
-[.tsrm], -
-[.zend]
+OUT_DIR = $(OUTDIR).$(CONFIG)
 
 ############################################################################
-# Compiler flags combination
-############################################################################
-CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLUDES))
-
-############################################################################
-# First
+# First for all libraries
 ############################################################################
 .FIRST
     @ ! defines for nested includes
     @ define streams [.main.streams]
-    @ ! names
-    @ BUILD_OUT_DIR = F$ENVIRONMENT("DEFAULT")-"]"+".$(OUT_DIR).]"
-    @ BUILD_OBJ_DIR = F$ENVIRONMENT("DEFAULT")-"]"+".$(OBJ_DIR).]"
-    @ define /trans=concealed php$build_out 'BUILD_OUT_DIR'
-    @ define /trans=concealed php$build_obj 'BUILD_OBJ_DIR'
 
 ############################################################################
 # Suffixes and rules
@@ -95,11 +81,11 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
     /RULES=[.vms.mms]rules.mms-
     /MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
-        "OBJ_DIR=$(OBJ_DIR)", -
-        "CC_QUALIFIERS=$(CC_QUALIFIERS)", -
-        "CC_DEFINES=$(CC_DEFINES)", -
-        "CC_INCLUDES=$(CC_INCLUDES)", -
-        "HEADERS=$(HEADERS)" -
+        "IS_DEBUG=$(IS_DEBUG)",-
+        "CC_QUALIFIERS_G=$(CC_QUALIFIERS_G)",-
+        "CC_DEFINES_G=$(CC_DEFINES_G)",-
+        "CC_INCLUDES_G=$(CC_INCLUDES_G)",-
+        "HEADERS_G=$(HEADERS_G)"-
     )
 
 .MMS.EXE
@@ -108,26 +94,18 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
     /RULES=[.vms.mms]rules.mms-
     /MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
-        "OBJ_DIR=$(OBJ_DIR)", -
-        "CC_QUALIFIERS=$(CC_QUALIFIERS)", -
-        "CC_DEFINES=$(CC_DEFINES)", -
-        "CC_INCLUDES=$(CC_INCLUDES)", -
-        "HEADERS=$(HEADERS)" -
+        "IS_DEBUG=$(IS_DEBUG)",-
+        "CC_QUALIFIERS_G=$(CC_QUALIFIERS_G)",-
+        "CC_DEFINES_G=$(CC_DEFINES_G)",-
+        "CC_INCLUDES_G=$(CC_INCLUDES_G)",-
+        "HEADERS_G=$(HEADERS_G)"-
     )
-
-############################################################################
-# H
-############################################################################
-HEADERS = -
-[.main]php_config.h -
-[.zend]zend_config.h -
-[.main]build-defs.h
 
 ############################################################################
 # Target
 ############################################################################
 TARGET : -
-$(HEADERS) -
+$(HEADERS_G) -
 [.$(OUT_DIR)]phplib_date.olb -
 [.$(OUT_DIR)]phplib_pcre.olb -
 [.$(OUT_DIR)]libxml.olb -
@@ -135,11 +113,13 @@ $(HEADERS) -
 [.$(OUT_DIR)]ctype.olb -
 [.$(OUT_DIR)]dom.olb -
 [.$(OUT_DIR)]fileinfo.olb -
+[.$(OUT_DIR)]filter.olb -
+[.$(OUT_DIR)]hash.olb -
 ![.$(OUT_DIR)]bcmath.exe
     ! target built
 
 ############################################################################
-# H
+# Headers rules
 ############################################################################
 [.main]php_config.h : [.vms]php_config.h
     copy [.vms]php_config.h [.main]php_config.h
@@ -184,6 +164,16 @@ $(HEADERS) -
 # fileinfo
 ############################################################################
 [.$(OUT_DIR)]fileinfo.olb : [.vms.mms]fileinfo.mms
+
+############################################################################
+# filter
+############################################################################
+[.$(OUT_DIR)]filter.olb : [.vms.mms]filter.mms
+
+############################################################################
+# hash
+############################################################################
+[.$(OUT_DIR)]hash.olb : [.vms.mms]hash.mms
 
 ############################################################################
 # bcmath

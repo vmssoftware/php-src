@@ -31,9 +31,7 @@
 #define O_RDONLY _O_RDONLY
 #include "win32/param.h"
 #else
-#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif
 #endif
 
 #include "ext/standard/head.h"

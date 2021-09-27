@@ -33,9 +33,7 @@
 #include "win32/winutil.h"
 #define GET_DL_ERROR()	php_win_err()
 #else
-#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif
 #define GET_DL_ERROR()	DL_ERROR()
 #endif
 #endif /* defined(HAVE_LIBDL) */

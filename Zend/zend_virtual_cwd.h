@@ -314,7 +314,11 @@ extern void virtual_cwd_main_cwd_init(uint8_t);
 #define VCWD_CHMOD(path, mode) chmod(path, mode)
 #endif
 
+#ifdef __VMS
+#define VCWD_CHDIR_FILE(path) virtual_chdir_file(path, (void*)chdir)
+#else
 #define VCWD_CHDIR_FILE(path) virtual_chdir_file(path, chdir)
+#endif
 #define VCWD_GETWD(buf) getwd(buf)
 #define VCWD_STAT(path, buff) php_sys_stat(path, buff)
 #define VCWD_LSTAT(path, buff) lstat(path, buff)

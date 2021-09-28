@@ -223,7 +223,9 @@ typedef unsigned int socklen_t;
 #include "win32/param.h"
 # else
 #include <pwd.h>
+#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
+#endif
 # endif
 #endif
 

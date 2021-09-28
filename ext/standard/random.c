@@ -174,7 +174,7 @@ PHPAPI int php_random_bytes(void *bytes, size_t size, bool should_throw)
 		}
 
 		for (read_bytes = 0; read_bytes < size; read_bytes += (size_t) n) {
-			n = read(fd, bytes + read_bytes, size - read_bytes);
+			n = read(fd, (char*)bytes + read_bytes, size - read_bytes); // __VMS: arithmetic operation on a void*
 			if (n <= 0) {
 				break;
 			}

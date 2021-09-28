@@ -26,6 +26,9 @@
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
+#if defined(__VMS) && !defined(HAVE_SYSLOG_H)
+# include "vms/syslog.h"
+#endif
 #endif
 
 /* Syslog filters */

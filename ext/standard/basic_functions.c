@@ -1496,7 +1496,11 @@ PHPAPI int _php_error_log_ex(int opt_err, const char *message, size_t message_le
 			break;
 
 		default:
+#ifdef HAVE_SYSLOG_H
 			php_log_err_with_severity(message, LOG_NOTICE);
+#else
+			php_log_err_with_severity(message, 6);  // __VMS
+#endif
 			break;
 	}
 	return SUCCESS;

@@ -34,7 +34,9 @@
 #endif
 
 #include <stdlib.h>
+#ifndef __VMS
 #include <search.h>
+#endif
 
 #endif /* HAVE_SCANDIR */
 

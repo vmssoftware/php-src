@@ -9,7 +9,6 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
 ############################################################################
 .FIRST
     @ ! defines for nested includes
-    @ define streams [.main.streams]
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).ext.iconv] | copy SYS$INPUT nl:
 

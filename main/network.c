@@ -30,7 +30,9 @@
 # define O_RDONLY _O_RDONLY
 # include "win32/param.h"
 #else
+#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
+#endif
 #endif
 
 #include <sys/types.h>
@@ -924,6 +926,15 @@ php_socket_t php_network_connect_socket_to_host(const char *host, unsigned short
 
 		/* adjust timeout for next attempt */
 #if HAVE_GETTIMEOFDAY
+
+#ifndef timercmp
+/* does not work for >= and <= */
+# define timercmp(a, b, CMP)         \
+  (((a)->tv_sec == (b)->tv_sec) ?    \
+  ((a)->tv_usec CMP (b)->tv_usec) :  \
+    ((a)->tv_sec CMP (b)->tv_sec))
+#endif
+
 		if (timeout) {
 			gettimeofday(&time_now, NULL);
 

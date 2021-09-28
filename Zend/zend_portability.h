@@ -448,10 +448,41 @@ extern "C++" {
 # define zend_isinf std::isinf
 # define zend_finite std::isfinite
 #else
+
+#ifdef __VMS
+#ifdef __cplusplus
+extern "C" {
+#endif
+    int fp_classf( float __x );
+    int fp_class( double __x );
+    int fp_classl( long double __x );
+#ifdef __cplusplus
+}
+#endif
+#   define zend_isnan(x)                 \
+        (sizeof(x)==sizeof(float)       \
+            ? fp_classf(x)>>1 == 0      \
+            : sizeof(x)==sizeof(double) \
+                ? fp_class(x)>>1 == 0   \
+                : fp_classl(x)>>1 == 0)
+#   define zend_isinf(x)            \
+        (sizeof(x)==sizeof(float)       \
+            ? fp_classf(x)>>1 == 1      \
+            : sizeof(x)==sizeof(double) \
+                ? fp_class(x)>>1 == 1   \
+                : fp_classl(x)>>1 == 1)
+#   define zend_finite(x)              \
+        (sizeof(x)==sizeof(float)       \
+            ? fp_classf(x)>>1 > 1       \
+            : sizeof(x)==sizeof(double) \
+                ? fp_class(x)>>1 > 1    \
+                : fp_classl(x)>>1 > 1)
+#else
 # include <math.h>
 # define zend_isnan(a) isnan(a)
 # define zend_isinf(a) isinf(a)
 # define zend_finite(a) isfinite(a)
+#endif
 #endif
 
 #define ZEND_STRL(str)		(str), (sizeof(str)-1)

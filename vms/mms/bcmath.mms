@@ -55,7 +55,7 @@ OBJ_FILES = -
 ############################################################################
 # Source files
 ############################################################################
-[.$(OBJ_DIR).ext.bcmath]bcmath.obj : [.ext.bcmath]bcmath.obj : c $(HEADERS)
+[.$(OBJ_DIR).ext.bcmath]bcmath.obj : [.ext.bcmath]bcmath.c $(HEADERS)
 [.$(OBJ_DIR).ext.bcmath.libbcmath]add.obj : [.ext.bcmath.libbcmath.src]add.c $(HEADERS)
 [.$(OBJ_DIR).ext.bcmath.libbcmath]compare.obj : [.ext.bcmath.libbcmath.src]compare.c $(HEADERS)
 [.$(OBJ_DIR).ext.bcmath.libbcmath]debug.obj : [.ext.bcmath.libbcmath.src]debug.c $(HEADERS)

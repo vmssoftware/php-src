@@ -18,7 +18,7 @@ CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLU
 ############################################################################
 # Main target
 ############################################################################
-TARGET : [.$(OUT_DIR)]fileinfo.olb
+TARGET : [.$(OUT_DIR)]phplib_fileinfo.olb
     ! fileinfo is built
 
 ############################################################################
@@ -49,7 +49,7 @@ OBJ_FILES = -
 ############################################################################
 # Main target rule
 ############################################################################
-[.$(OUT_DIR)]fileinfo.olb : [.$(OUT_DIR)]fileinfo.olb($(OBJ_FILES))
+[.$(OUT_DIR)]phplib_fileinfo.olb : [.$(OUT_DIR)]phplib_fileinfo.olb($(OBJ_FILES))
     continue
 
 ############################################################################

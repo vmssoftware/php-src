@@ -5,7 +5,7 @@
 ############################################################################
 # Compiler qualifiers
 ############################################################################
-CC_QUALIFIERS_G = -
+CC_QUALIFIERS = -
 /NAMES=(AS_IS,SHORTENED) -
 /WARNINGS=(WARNINGS=ALL, DISABLE=(-
     EXTRASEMI,-
@@ -15,13 +15,14 @@ CC_QUALIFIERS_G = -
     UNSTRUCTMEM,-
     DUPTYPESPEC,-
     INTCONSTTRUNC,-
+    TOOFEWACTUALS,-
     UNDEFESCAP)) -
 /ACCEPT=NOVAXC_KEYWORDS
 
 ############################################################################
 # Compiler definitions
 ############################################################################
-CC_DEFINES_G = -
+CC_DEFINES = -
 _USE_STD_STAT,-
 _POSIX_EXIT,-
 __STDC_FORMAT_MACROS,-
@@ -35,7 +36,7 @@ BIND_4_COMPAT=1
 ############################################################################
 # Include folders
 ############################################################################
-CC_INCLUDES_G = -
+CC_INCLUDES = -
 [], -
 [.main], -
 [.tsrm], -
@@ -44,7 +45,7 @@ CC_INCLUDES_G = -
 ############################################################################
 # Headers
 ############################################################################
-HEADERS_G = -
+HEADERS = -
 [.main]php_config.h -
 [.zend]zend_config.h -
 [.main]build-defs.h
@@ -77,6 +78,11 @@ OUT_DIR = $(OUTDIR).$(CONFIG)
 .FIRST
     @ ! defines for nested includes
     @ define streams [.main.streams]
+    ! names
+    @ BUILD_OUT_DIR = F$ENVIRONMENT("DEFAULT")-"]"+".$(OUT_DIR).]"
+    @ BUILD_OBJ_DIR = F$ENVIRONMENT("DEFAULT")-"]"+".$(OBJ_DIR).]"
+    @ define /trans=concealed php$build_out 'BUILD_OUT_DIR'
+    @ define /trans=concealed php$build_obj 'BUILD_OBJ_DIR'
 
 ############################################################################
 # Suffixes and rules
@@ -91,10 +97,10 @@ OUT_DIR = $(OUTDIR).$(CONFIG)
     /MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
         "IS_DEBUG=$(IS_DEBUG)",-
-        "CC_QUALIFIERS_G=$(CC_QUALIFIERS_G)",-
-        "CC_DEFINES_G=$(CC_DEFINES_G)",-
-        "CC_INCLUDES_G=$(CC_INCLUDES_G)",-
-        "HEADERS_G=$(HEADERS_G)"-
+        "CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
+        "CC_DEFINES_G=$(CC_DEFINES)",-
+        "CC_INCLUDES_G=$(CC_INCLUDES)",-
+        "HEADERS_G=$(HEADERS)"-
     )
 
 .MMS.EXE
@@ -104,43 +110,48 @@ OUT_DIR = $(OUTDIR).$(CONFIG)
     /MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
         "IS_DEBUG=$(IS_DEBUG)",-
-        "CC_QUALIFIERS_G=$(CC_QUALIFIERS_G)",-
-        "CC_DEFINES_G=$(CC_DEFINES_G)",-
-        "CC_INCLUDES_G=$(CC_INCLUDES_G)",-
-        "HEADERS_G=$(HEADERS_G)"-
+        "CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
+        "CC_DEFINES_G=$(CC_DEFINES)",-
+        "CC_INCLUDES_G=$(CC_INCLUDES)",-
+        "HEADERS_G=$(HEADERS)"-
     )
+
+############################################################################
+# Libraries
+############################################################################
+PHP_LIB_FILES = -
+[.$(OUT_DIR)]phplib_ctype.olb -
+[.$(OUT_DIR)]phplib_date.olb -
+[.$(OUT_DIR)]phplib_dom.olb -
+[.$(OUT_DIR)]phplib_fileinfo.olb -
+[.$(OUT_DIR)]phplib_filter.olb -
+[.$(OUT_DIR)]phplib_hash.olb -
+[.$(OUT_DIR)]phplib_iconv.olb -
+[.$(OUT_DIR)]phplib_json.olb -
+[.$(OUT_DIR)]phplib_libxml.olb -
+[.$(OUT_DIR)]phplib_main.olb -
+[.$(OUT_DIR)]phplib_pcre.olb -
+[.$(OUT_DIR)]phplib_pdo.olb -
+[.$(OUT_DIR)]phplib_pdolite.olb -
+[.$(OUT_DIR)]phplib_phar.olb -
+[.$(OUT_DIR)]phplib_posix.olb -
+[.$(OUT_DIR)]phplib_reflection.olb -
+[.$(OUT_DIR)]phplib_session.olb -
+[.$(OUT_DIR)]phplib_simplexml.olb -
+[.$(OUT_DIR)]phplib_spl.olb -
+[.$(OUT_DIR)]phplib_sqlite3.olb -
+[.$(OUT_DIR)]phplib_standard.olb -
+[.$(OUT_DIR)]phplib_streams.olb -
+[.$(OUT_DIR)]phplib_tokenizer.olb -
+[.$(OUT_DIR)]phplib_tsrm.olb -
+[.$(OUT_DIR)]phplib_xml.olb -
+[.$(OUT_DIR)]phplib_zend.olb
 
 ############################################################################
 # Target
 ############################################################################
 TARGET : -
-$(HEADERS_G) -
-[.$(OUT_DIR)]phplib_date.olb -
-[.$(OUT_DIR)]phplib_pcre.olb -
-[.$(OUT_DIR)]libxml.olb -
-[.$(OUT_DIR)]sqlite3.olb -
-[.$(OUT_DIR)]ctype.olb -
-[.$(OUT_DIR)]dom.olb -
-[.$(OUT_DIR)]fileinfo.olb -
-[.$(OUT_DIR)]filter.olb -
-[.$(OUT_DIR)]hash.olb -
-[.$(OUT_DIR)]phplib_iconv.olb -
-[.$(OUT_DIR)]phplib_json.olb -
-[.$(OUT_DIR)]phplib_pdo.olb -
-[.$(OUT_DIR)]phplib_pdolite.olb -
-[.$(OUT_DIR)]phplib_phar.olb -
-[.$(OUT_DIR)]phplib_posix.olb -
-[.$(OUT_DIR)]php_reflection.olb -
-[.$(OUT_DIR)]phplib_session.olb -
-[.$(OUT_DIR)]phplib_simplexml.olb -
-[.$(OUT_DIR)]phplib_spl.olb -
-[.$(OUT_DIR)]phplib_standard.olb -
-[.$(OUT_DIR)]phplib_tokenizer.olb -
-[.$(OUT_DIR)]phplib_xml.olb -
-[.$(OUT_DIR)]phplib_tsrm.olb -
-[.$(OUT_DIR)]phplib_main.olb -
-[.$(OUT_DIR)]phplib_streams.olb -
-[.$(OUT_DIR)]phplib_zend.olb
+[.$(OUT_DIR)]php$shr.exe
     ! target built
 
 ############################################################################
@@ -241,12 +252,12 @@ PHPLIB_PCRE_FILES = -
 ############################################################################
 # libxml
 ############################################################################
-[.$(OUT_DIR)]libxml.olb : [.vms.mms]libxml.mms [.ext.libxml]libxml.c $(HEADERS)
+[.$(OUT_DIR)]phplib_libxml.olb : [.vms.mms]phplib_libxml.mms [.ext.libxml]libxml.c $(HEADERS)
 
 ############################################################################
 # sqlite3
 ############################################################################
-[.$(OUT_DIR)]sqlite3.olb : [.vms.mms]sqlite3.mms [.ext.sqlite3]sqlite3.c $(HEADERS)
+[.$(OUT_DIR)]phplib_sqlite3.olb : [.vms.mms]phplib_sqlite3.mms [.ext.sqlite3]sqlite3.c $(HEADERS)
 
 ############################################################################
 # dom
@@ -275,12 +286,12 @@ DOM_FILES = -
 [.ext.dom]text.c -
 [.ext.dom]xpath.c
 
-[.$(OUT_DIR)]dom.olb : [.vms.mms]dom.mms $(DOM_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_dom.olb : [.vms.mms]phplib_dom.mms $(DOM_FILES) $(HEADERS)
 
 ############################################################################
 # ctype
 ############################################################################
-[.$(OUT_DIR)]ctype.olb : [.vms.mms]ctype.mms [.ext.ctype]ctype.c $(HEADERS)
+[.$(OUT_DIR)]phplib_ctype.olb : [.vms.mms]phplib_ctype.mms [.ext.ctype]ctype.c $(HEADERS)
 
 ############################################################################
 # fileinfo
@@ -307,7 +318,7 @@ FILEINFO_FILES = -
 [.ext.fileinfo.libmagic]softmagic.c -
 [.ext.fileinfo.libmagic]strcasestr.c
 
-[.$(OUT_DIR)]fileinfo.olb : [.vms.mms]fileinfo.mms $(FILEINFO_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_fileinfo.olb : [.vms.mms]phplib_fileinfo.mms $(FILEINFO_FILES) $(HEADERS)
 
 ############################################################################
 # filter
@@ -318,7 +329,7 @@ FILTER_FILES = -
 [.ext.filter]logical_filters.c -
 [.ext.filter]callback_filter.c
 
-[.$(OUT_DIR)]filter.olb : [.vms.mms]filter.mms $(FILTER_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_filter.olb : [.vms.mms]phplib_filter.mms $(FILTER_FILES) $(HEADERS)
 
 ############################################################################
 # hash
@@ -340,7 +351,7 @@ HASH_FILES = -
 [.ext.hash]hash_whirlpool.c -
 [.ext.hash]hash_xxhash.c
 
-[.$(OUT_DIR)]hash.olb : [.vms.mms]hash.mms $(HASH_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_hash.olb : [.vms.mms]phplib_hash.mms $(HASH_FILES) $(HEADERS)
 
 ############################################################################
 # iconv
@@ -404,7 +415,7 @@ PHAR_FILES = -
 ############################################################################
 # reflection
 ############################################################################
-[.$(OUT_DIR)]php_reflection.olb : [.vms.mms]php_reflection.mms [.ext.reflection]php_reflection.c $(HEADERS)
+[.$(OUT_DIR)]phplib_reflection.olb : [.vms.mms]phplib_reflection.mms [.ext.reflection]php_reflection.c $(HEADERS)
 
 ############################################################################
 # session
@@ -607,7 +618,7 @@ ZEND_FILES = -
 [.Zend]zend_fibers.c -
 [.Zend]zend_float.c -
 [.Zend]zend_gc.c -
-[.Zend]zend_gdb.c -
+- ! [.Zend]zend_gdb.c -
 [.Zend]zend_generators.c -
 [.Zend]zend_hash.c -
 [.Zend]zend_highlight.c -
@@ -643,6 +654,11 @@ ZEND_FILES = -
 [.Zend]zend_weakrefs.c
 
 [.$(OUT_DIR)]phplib_zend.olb : [.vms.mms]phplib_zend.mms $(ZEND_FILES) $(HEADERS)
+
+############################################################################
+# php$shr
+############################################################################
+[.$(OUT_DIR)]php$shr.exe : [.vms.mms]php$shr.mms $(PHP_LIB_FILES)
 
 ############################################################################
 CLEAN :

@@ -45,7 +45,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).Zend]zend_fibers.obj -
 [.$(OBJ_DIR).Zend]zend_float.obj -
 [.$(OBJ_DIR).Zend]zend_gc.obj -
-[.$(OBJ_DIR).Zend]zend_gdb.obj -
+- ! [.$(OBJ_DIR).Zend]zend_gdb.obj -
 [.$(OBJ_DIR).Zend]zend_generators.obj -
 [.$(OBJ_DIR).Zend]zend_hash.obj -
 [.$(OBJ_DIR).Zend]zend_highlight.obj -
@@ -109,7 +109,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).Zend]zend_fibers.obj : [.Zend]zend_fibers.c $(HEADERS)
 [.$(OBJ_DIR).Zend]zend_float.obj : [.Zend]zend_float.c $(HEADERS)
 [.$(OBJ_DIR).Zend]zend_gc.obj : [.Zend]zend_gc.c $(HEADERS)
-[.$(OBJ_DIR).Zend]zend_gdb.obj : [.Zend]zend_gdb.c $(HEADERS)
+! [.$(OBJ_DIR).Zend]zend_gdb.obj : [.Zend]zend_gdb.c $(HEADERS)
 [.$(OBJ_DIR).Zend]zend_generators.obj : [.Zend]zend_generators.c $(HEADERS)
 [.$(OBJ_DIR).Zend]zend_hash.obj : [.Zend]zend_hash.c $(HEADERS)
 [.$(OBJ_DIR).Zend]zend_highlight.obj : [.Zend]zend_highlight.c $(HEADERS)

@@ -4,7 +4,7 @@
 
 CC_FLAGS = $(CC_QUALIFIERS)-
 /DEFINE=($(CC_DEFINES))-
-/INCLUDE_DIRECTORY=($(CC_INCLUDES),[.ext.reflection])
+/INCLUDE_DIRECTORY=($(CC_INCLUDES),[.ext.posix])
 
 ############################################################################
 # First
@@ -12,27 +12,27 @@ CC_FLAGS = $(CC_QUALIFIERS)-
 .FIRST
     @ ! defines for nested includes
     @ ! create output directory (because of bug in MMS)
-    @ pipe create/dir [.$(OBJ_DIR).ext.reflection] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).ext.posix] | copy SYS$INPUT nl:
 
 ############################################################################
 # Main target
 ############################################################################
-TARGET : [.$(OUT_DIR)]php_reflection.olb
-    ! php_reflection is built
+TARGET : [.$(OUT_DIR)]phplib_posix.olb
+    ! phplib_posix is built
 
 ############################################################################
 # Object files
 ############################################################################
 OBJ_FILES = -
-[.$(OBJ_DIR).ext.reflection]php_reflection.obj -
+[.$(OBJ_DIR).ext.posix]posix.obj -
 
 ############################################################################
 # Main target rule
 ############################################################################
-[.$(OUT_DIR)]php_reflection.olb : [.$(OUT_DIR)]php_reflection.olb($(OBJ_FILES))
+[.$(OUT_DIR)]phplib_posix.olb : [.$(OUT_DIR)]phplib_posix.olb($(OBJ_FILES))
     continue
 
 ############################################################################
 # Source files
 ############################################################################
-[.$(OBJ_DIR).ext.reflection]php_reflection.obj : [.ext.reflection]php_reflection.c $(HEADERS)
+[.$(OBJ_DIR).ext.posix]posix.obj : [.ext.posix]posix.c $(HEADERS)

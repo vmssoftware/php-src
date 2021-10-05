@@ -21,6 +21,9 @@
 
 #ifdef PHP_WIN32
 #include "win32/syslog.h"
+#elif defined (__VMS)
+#include <php_config.h>
+#include "vms/syslog.h"
 #else
 #include <php_config.h>
 #ifdef HAVE_SYSLOG_H

@@ -27,6 +27,11 @@
 
 #ifdef HAVE_POSIX
 
+#ifdef __VMS
+#include <unixio.h>
+#include <unistd.h>
+#endif
+
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
@@ -704,9 +709,12 @@ int php_posix_group_to_array(struct group *g, zval *array_group) /* {{{ */
 	array_init(&array_members);
 
 	add_assoc_string(array_group, "name", g->gr_name);
+#ifndef __VMS
 	if (g->gr_passwd) {
 		add_assoc_string(array_group, "passwd", g->gr_passwd);
-	} else {
+	} else 
+#endif
+    {
 		add_assoc_null(array_group, "passwd");
 	}
 	for (count = 0;; count++) {
@@ -896,10 +904,18 @@ int php_posix_passwd_to_array(struct passwd *pw, zval *return_value) /* {{{ */
 		return 0;
 
 	add_assoc_string(return_value, "name",      pw->pw_name);
+#ifdef __VMS
+	add_assoc_null(return_value, "passwd");
+#else
 	add_assoc_string(return_value, "passwd",    pw->pw_passwd);
+#endif
 	add_assoc_long  (return_value, "uid",       pw->pw_uid);
 	add_assoc_long  (return_value, "gid",		pw->pw_gid);
+#ifdef __VMS
+	add_assoc_null(return_value, "gecos");
+#else
 	add_assoc_string(return_value, "gecos",     pw->pw_gecos);
+#endif
 	add_assoc_string(return_value, "dir",       pw->pw_dir);
 	add_assoc_string(return_value, "shell",     pw->pw_shell);
 	return 1;

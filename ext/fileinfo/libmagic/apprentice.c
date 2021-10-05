@@ -185,7 +185,11 @@ private struct {
 	{ NULL, 0, NULL }
 };
 
+#ifdef __VMS
+#include "fileinfo/data_file.c"
+#else
 #include "../data_file.c"
+#endif
 
 struct type_tbl_s {
 	const char name[16];

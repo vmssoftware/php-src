@@ -11,8 +11,11 @@ $(CC_QUALIFIERS)-
 # First
 ############################################################################
 .FIRST
+    @ define murmur [.ext.hash.murmur]
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).ext.hash] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).ext.hash.murmur] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).ext.hash.sha3.generic32lc] | copy SYS$INPUT nl:
 
 ############################################################################
 # Main target
@@ -25,21 +28,26 @@ TARGET : [.$(OUT_DIR)]phplib_hash.olb
 ############################################################################
 OBJ_FILES = -
 [.$(OBJ_DIR).ext.hash]hash.obj -
+[.$(OBJ_DIR).ext.hash]hash_md.obj -
+[.$(OBJ_DIR).ext.hash]hash_sha.obj -
+[.$(OBJ_DIR).ext.hash]hash_ripemd.obj -
+[.$(OBJ_DIR).ext.hash]hash_haval.obj -
+[.$(OBJ_DIR).ext.hash]hash_tiger.obj -
+[.$(OBJ_DIR).ext.hash]hash_gost.obj -
+[.$(OBJ_DIR).ext.hash]hash_snefru.obj -
+[.$(OBJ_DIR).ext.hash]hash_whirlpool.obj -
 [.$(OBJ_DIR).ext.hash]hash_adler32.obj -
 [.$(OBJ_DIR).ext.hash]hash_crc32.obj -
 [.$(OBJ_DIR).ext.hash]hash_fnv.obj -
-[.$(OBJ_DIR).ext.hash]hash_gost.obj -
-[.$(OBJ_DIR).ext.hash]hash_haval.obj -
 [.$(OBJ_DIR).ext.hash]hash_joaat.obj -
-[.$(OBJ_DIR).ext.hash]hash_md.obj -
-[.$(OBJ_DIR).ext.hash]hash_ripemd.obj -
-[.$(OBJ_DIR).ext.hash]hash_sha.obj -
-[.$(OBJ_DIR).ext.hash]hash_sha3.obj -
-[.$(OBJ_DIR).ext.hash]hash_snefru.obj -
-[.$(OBJ_DIR).ext.hash]hash_tiger.obj -
-[.$(OBJ_DIR).ext.hash]hash_whirlpool.obj -
+[.$(OBJ_DIR).ext.hash.murmur]PMurHash.obj -
+[.$(OBJ_DIR).ext.hash.murmur]PMurHash128.obj -
+[.$(OBJ_DIR).ext.hash]hash_murmur.obj -
 [.$(OBJ_DIR).ext.hash]hash_xxhash.obj -
-
+[.$(OBJ_DIR).ext.hash.sha3.generic32lc]KeccakP-1600-inplace32BI.obj -
+[.$(OBJ_DIR).ext.hash.sha3.generic32lc]KeccakHash.obj -
+[.$(OBJ_DIR).ext.hash.sha3.generic32lc]KeccakSponge.obj -
+[.$(OBJ_DIR).ext.hash]hash_sha3.obj -
 
 ############################################################################
 # Main target rule
@@ -51,17 +59,30 @@ OBJ_FILES = -
 # Source files
 ############################################################################
 [.$(OBJ_DIR).ext.hash]hash.obj : [.ext.hash]hash.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_md.obj : [.ext.hash]hash_md.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_sha.obj : [.ext.hash]hash_sha.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_ripemd.obj : [.ext.hash]hash_ripemd.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_haval.obj : [.ext.hash]hash_haval.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_tiger.obj : [.ext.hash]hash_tiger.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_gost.obj : [.ext.hash]hash_gost.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_snefru.obj : [.ext.hash]hash_snefru.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_whirlpool.obj : [.ext.hash]hash_whirlpool.c $(HEADERS)
 [.$(OBJ_DIR).ext.hash]hash_adler32.obj : [.ext.hash]hash_adler32.c $(HEADERS)
 [.$(OBJ_DIR).ext.hash]hash_crc32.obj : [.ext.hash]hash_crc32.c $(HEADERS)
 [.$(OBJ_DIR).ext.hash]hash_fnv.obj : [.ext.hash]hash_fnv.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_gost.obj : [.ext.hash]hash_gost.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_haval.obj : [.ext.hash]hash_haval.c $(HEADERS)
 [.$(OBJ_DIR).ext.hash]hash_joaat.obj : [.ext.hash]hash_joaat.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_md.obj : [.ext.hash]hash_md.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_ripemd.obj : [.ext.hash]hash_ripemd.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_sha.obj : [.ext.hash]hash_sha.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_sha3.obj : [.ext.hash]hash_sha3.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_snefru.obj : [.ext.hash]hash_snefru.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_tiger.obj : [.ext.hash]hash_tiger.c $(HEADERS)
-[.$(OBJ_DIR).ext.hash]hash_whirlpool.obj : [.ext.hash]hash_whirlpool.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_murmur.obj : [.ext.hash]hash_murmur.c $(HEADERS)
 [.$(OBJ_DIR).ext.hash]hash_xxhash.obj : [.ext.hash]hash_xxhash.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash]hash_sha3.obj : [.ext.hash]hash_sha3.c $(HEADERS)
+
+[.$(OBJ_DIR).ext.hash.murmur]PMurHash.obj : [.ext.hash.murmur]PMurHash.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash.murmur]PMurHash128.obj : [.ext.hash.murmur]PMurHash128.c $(HEADERS)
+
+[.$(OBJ_DIR).ext.hash.sha3.generic32lc]KeccakP-1600-inplace32BI.obj : [.ext.hash.sha3.generic32lc]KeccakP-1600-inplace32BI.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash.sha3.generic32lc]KeccakHash.obj : [.ext.hash.sha3.generic32lc]KeccakHash.c $(HEADERS)
+[.$(OBJ_DIR).ext.hash.sha3.generic32lc]KeccakSponge.obj : [.ext.hash.sha3.generic32lc]KeccakSponge.c $(HEADERS)
+
+! [.$(OBJ_DIR).ext.hash.sha3.generic64lc]KeccakP-1600-opt64.obj : [.ext.hash.sha3.generic64lc]KeccakP-1600-opt64.c $(HEADERS)
+! [.$(OBJ_DIR).ext.hash.sha3.generic64lc]KeccakHash.obj : [.ext.hash.sha3.generic64lc]KeccakHash.c $(HEADERS)
+! [.$(OBJ_DIR).ext.hash.sha3.generic64lc]KeccakSponge.obj : [.ext.hash.sha3.generic64lc]KeccakSponge.c $(HEADERS)
+

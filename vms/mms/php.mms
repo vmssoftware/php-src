@@ -4,60 +4,48 @@
 
 CC_FLAGS = $(CC_QUALIFIERS)-
 /DEFINE=($(CC_DEFINES))-
-/INCLUDE_DIRECTORY=($(CC_INCLUDES))
+/INCLUDE_DIRECTORY=($(CC_INCLUDES),[.sapi.cli])
 
 ############################################################################
 # First
 ############################################################################
 .FIRST
     @ ! defines for nested includes
+    @ define lib [.ext.date.lib]
     @ ! create output directory (because of bug in MMS)
-    @ pipe create/dir [.$(OBJ_DIR)] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).sapi.cli] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).vms] | copy SYS$INPUT nl:
 
 ############################################################################
 # Main target
 ############################################################################
-TARGET : [.$(OUT_DIR)]php$shr.exe
-    ! php$shr.exe is built
+TARGET : [.$(OUT_DIR)]php.exe
+    ! php client is built
 
 ############################################################################
 # Object files
 ############################################################################
-PHP_LIBRARIES = -
-[.$(OUT_DIR)]phplib_ctype.olb -
-[.$(OUT_DIR)]phplib_date.olb -
-[.$(OUT_DIR)]phplib_dom.olb -
-[.$(OUT_DIR)]phplib_fileinfo.olb -
-[.$(OUT_DIR)]phplib_filter.olb -
-[.$(OUT_DIR)]phplib_hash.olb -
-[.$(OUT_DIR)]phplib_iconv.olb -
-[.$(OUT_DIR)]phplib_json.olb -
-[.$(OUT_DIR)]phplib_libxml.olb -
-[.$(OUT_DIR)]phplib_main.olb -
-[.$(OUT_DIR)]phplib_pcre.olb -
-[.$(OUT_DIR)]phplib_pdo.olb -
-[.$(OUT_DIR)]phplib_pdolite.olb -
-[.$(OUT_DIR)]phplib_phar.olb -
-[.$(OUT_DIR)]phplib_posix.olb -
-[.$(OUT_DIR)]phplib_reflection.olb -
-[.$(OUT_DIR)]phplib_session.olb -
-[.$(OUT_DIR)]phplib_simplexml.olb -
-[.$(OUT_DIR)]phplib_spl.olb -
-[.$(OUT_DIR)]phplib_sqlite3.olb -
-[.$(OUT_DIR)]phplib_standard.olb -
-[.$(OUT_DIR)]phplib_streams.olb -
-[.$(OUT_DIR)]phplib_tokenizer.olb -
-[.$(OUT_DIR)]phplib_tsrm.olb -
-[.$(OUT_DIR)]phplib_xml.olb -
-[.$(OUT_DIR)]phplib_zend.olb
+OBJ_FILES = -
+[.$(OBJ_DIR).sapi.cli]php_cli.obj -
+[.$(OBJ_DIR).sapi.cli]php_http_parser.obj -
+[.$(OBJ_DIR).sapi.cli]php_cli_server.obj -
+[.$(OBJ_DIR).sapi.cli]ps_title.obj -
+[.$(OBJ_DIR).sapi.cli]php_cli_process_title.obj -
+[.$(OBJ_DIR).vms]vms_crtl_init.obj -
 
 ############################################################################
 # Main target rule
 ############################################################################
-[.$(OUT_DIR)]php$shr.exe : $(PHP_LIBRARIES)
-    LINK/share=php$shr.exe [.vms.opt]php$shr.opt/opt
+[.$(OUT_DIR)]php.exe : $(OBJ_FILES)
+    LINK/exe=php.exe/threads=upcalls [.vms.opt]php.opt/opt
 
 ############################################################################
 # Source files
 ############################################################################
-
+[.$(OBJ_DIR).sapi.cli]php_cli.obj : [.sapi.cli]php_cli.c $(HEADERS)
+[.$(OBJ_DIR).sapi.cli]php_http_parser.obj : [.sapi.cli]php_http_parser.c $(HEADERS)
+[.$(OBJ_DIR).sapi.cli]php_cli_server.obj : [.sapi.cli]php_cli_server.c $(HEADERS)
+[.$(OBJ_DIR).sapi.cli]ps_title.obj : [.sapi.cli]ps_title.c $(HEADERS)
+[.$(OBJ_DIR).sapi.cli]php_cli_process_title.obj : [.sapi.cli]php_cli_process_title.c $(HEADERS)
+[.$(OBJ_DIR).vms]vms_crtl_init.obj : [.vms]vms_crtl_init.c $(HEADERS)
+    $(CC) $(CC_FLAGS)/ACCEPT=VAXC_KEYWORDS /OBJECT=$(MMS$TARGET) $(MMS$SOURCE)

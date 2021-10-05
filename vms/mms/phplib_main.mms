@@ -15,6 +15,7 @@ CC_FLAGS = $(CC_QUALIFIERS)-
     @ define lib [.ext.date.lib]
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).main] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).vms] | copy SYS$INPUT nl:
 
 ############################################################################
 # Main target
@@ -49,6 +50,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).main]spprintf.obj -
 [.$(OBJ_DIR).main]strlcat.obj -
 [.$(OBJ_DIR).main]strlcpy.obj -
+[.$(OBJ_DIR).vms]syslog.obj -
 
 ############################################################################
 # Main target rule
@@ -82,3 +84,4 @@ OBJ_FILES = -
 [.$(OBJ_DIR).main]spprintf.obj : [.main]spprintf.c $(HEADERS)
 [.$(OBJ_DIR).main]strlcat.obj : [.main]strlcat.c $(HEADERS)
 [.$(OBJ_DIR).main]strlcpy.obj : [.main]strlcpy.c $(HEADERS)
+[.$(OBJ_DIR).vms]syslog.obj : [.vms]syslog.c $(HEADERS)

@@ -35,6 +35,10 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.standard]crc32_x86.obj -
 [.$(OBJ_DIR).ext.standard]credits.obj -
 [.$(OBJ_DIR).ext.standard]crypt.obj -
+[.$(OBJ_DIR).ext.standard]crypt_blowfish.obj -
+[.$(OBJ_DIR).ext.standard]crypt_freesec.obj -
+[.$(OBJ_DIR).ext.standard]crypt_sha256.obj -
+[.$(OBJ_DIR).ext.standard]crypt_sha512.obj -
 [.$(OBJ_DIR).ext.standard]css.obj -
 [.$(OBJ_DIR).ext.standard]datetime.obj -
 [.$(OBJ_DIR).ext.standard]dir.obj -
@@ -71,6 +75,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.standard]pack.obj -
 [.$(OBJ_DIR).ext.standard]pageinfo.obj -
 [.$(OBJ_DIR).ext.standard]password.obj -
+[.$(OBJ_DIR).ext.standard]php_crypt_r.obj -
 [.$(OBJ_DIR).ext.standard]php_fopen_wrapper.obj -
 [.$(OBJ_DIR).ext.standard]proc_open.obj -
 [.$(OBJ_DIR).ext.standard]quot_print.obj -
@@ -91,7 +96,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.standard]uuencode.obj -
 [.$(OBJ_DIR).ext.standard]var.obj -
 [.$(OBJ_DIR).ext.standard]var_unserializer.obj -
-[.$(OBJ_DIR).ext.standard]versioning.obj -
+[.$(OBJ_DIR).ext.standard]versioning.obj
 
 ############################################################################
 # Main target rule
@@ -111,6 +116,10 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.standard]crc32_x86.obj : [.ext.standard]crc32_x86.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]credits.obj : [.ext.standard]credits.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]crypt.obj : [.ext.standard]crypt.c $(HEADERS)
+[.$(OBJ_DIR).ext.standard]crypt_blowfish.obj : [.ext.standard]crypt_blowfish.c $(HEADERS)
+[.$(OBJ_DIR).ext.standard]crypt_freesec.obj : [.ext.standard]crypt_freesec.c $(HEADERS)
+[.$(OBJ_DIR).ext.standard]crypt_sha256.obj : [.ext.standard]crypt_sha256.c $(HEADERS)
+[.$(OBJ_DIR).ext.standard]crypt_sha512.obj : [.ext.standard]crypt_sha512.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]css.obj : [.ext.standard]css.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]datetime.obj : [.ext.standard]datetime.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]dir.obj : [.ext.standard]dir.c $(HEADERS)
@@ -147,6 +156,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.standard]pack.obj : [.ext.standard]pack.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]pageinfo.obj : [.ext.standard]pageinfo.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]password.obj : [.ext.standard]password.c $(HEADERS)
+[.$(OBJ_DIR).ext.standard]php_crypt_r.obj : [.ext.standard]php_crypt_r.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]php_fopen_wrapper.obj : [.ext.standard]php_fopen_wrapper.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]proc_open.obj : [.ext.standard]proc_open.c $(HEADERS)
 [.$(OBJ_DIR).ext.standard]quot_print.obj : [.ext.standard]quot_print.c $(HEADERS)

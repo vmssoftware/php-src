@@ -67,7 +67,11 @@ on big endian machines.
   #define ROTL64(x,y)  _rotl64(x,y)
   #define BIG_CONSTANT(x) (x)
 #else
+  #ifdef __VMS
+  #define FORCE_INLINE static
+  #else
   #define FORCE_INLINE static inline __attribute__((always_inline))
+  #endif
   /* gcc recognises this code and generates a rotate instruction for CPUs with one */
   #define ROTL32(x,r)  (((uint32_t)x << r) | ((uint32_t)x >> (32 - r)))
   #define ROTL64(x,r)  (((uint64_t)x << r) | ((uint64_t)x >> (64 - r)))

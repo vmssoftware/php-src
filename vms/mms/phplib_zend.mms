@@ -14,6 +14,7 @@ CC_FLAGS = $(CC_QUALIFIERS)-
     @ define Optimizer [.Zend.Optimizer]
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).Zend] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).Zend.Optimizer] | copy SYS$INPUT nl:
 
 ############################################################################
 # zend target
@@ -79,6 +80,27 @@ OBJ_FILES = -
 [.$(OBJ_DIR).Zend]zend_virtual_cwd.obj -
 [.$(OBJ_DIR).Zend]zend_vm_opcodes.obj -
 [.$(OBJ_DIR).Zend]zend_weakrefs.obj -
+[.$(OBJ_DIR).Zend.Optimizer]zend_optimizer.obj -
+[.$(OBJ_DIR).Zend.Optimizer]pass1.obj -
+[.$(OBJ_DIR).Zend.Optimizer]pass3.obj -
+[.$(OBJ_DIR).Zend.Optimizer]optimize_func_calls.obj -
+[.$(OBJ_DIR).Zend.Optimizer]block_pass.obj -
+[.$(OBJ_DIR).Zend.Optimizer]optimize_temp_vars_5.obj -
+[.$(OBJ_DIR).Zend.Optimizer]nop_removal.obj -
+[.$(OBJ_DIR).Zend.Optimizer]compact_literals.obj -
+[.$(OBJ_DIR).Zend.Optimizer]zend_cfg.obj -
+[.$(OBJ_DIR).Zend.Optimizer]zend_dfg.obj -
+[.$(OBJ_DIR).Zend.Optimizer]dfa_pass.obj -
+[.$(OBJ_DIR).Zend.Optimizer]zend_ssa.obj -
+[.$(OBJ_DIR).Zend.Optimizer]zend_inference.obj -
+[.$(OBJ_DIR).Zend.Optimizer]zend_func_info.obj -
+[.$(OBJ_DIR).Zend.Optimizer]zend_call_graph.obj -
+[.$(OBJ_DIR).Zend.Optimizer]sccp.obj -
+[.$(OBJ_DIR).Zend.Optimizer]scdf.obj -
+[.$(OBJ_DIR).Zend.Optimizer]dce.obj -
+[.$(OBJ_DIR).Zend.Optimizer]escape_analysis.obj -
+[.$(OBJ_DIR).Zend.Optimizer]compact_vars.obj -
+[.$(OBJ_DIR).Zend.Optimizer]zend_dump.obj -
 
 ############################################################################
 # zend target rule
@@ -143,3 +165,25 @@ OBJ_FILES = -
 [.$(OBJ_DIR).Zend]zend_virtual_cwd.obj : [.Zend]zend_virtual_cwd.c $(HEADERS)
 [.$(OBJ_DIR).Zend]zend_vm_opcodes.obj : [.Zend]zend_vm_opcodes.c $(HEADERS)
 [.$(OBJ_DIR).Zend]zend_weakrefs.obj : [.Zend]zend_weakrefs.c $(HEADERS)
+
+[.$(OBJ_DIR).Zend.Optimizer]zend_optimizer.obj : [.Zend.Optimizer]zend_optimizer.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]pass1.obj : [.Zend.Optimizer]pass1.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]pass3.obj : [.Zend.Optimizer]pass3.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]optimize_func_calls.obj : [.Zend.Optimizer]optimize_func_calls.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]block_pass.obj : [.Zend.Optimizer]block_pass.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]optimize_temp_vars_5.obj : [.Zend.Optimizer]optimize_temp_vars_5.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]nop_removal.obj : [.Zend.Optimizer]nop_removal.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]compact_literals.obj : [.Zend.Optimizer]compact_literals.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]zend_cfg.obj : [.Zend.Optimizer]zend_cfg.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]zend_dfg.obj : [.Zend.Optimizer]zend_dfg.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]dfa_pass.obj : [.Zend.Optimizer]dfa_pass.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]zend_ssa.obj : [.Zend.Optimizer]zend_ssa.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]zend_inference.obj : [.Zend.Optimizer]zend_inference.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]zend_func_info.obj : [.Zend.Optimizer]zend_func_info.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]zend_call_graph.obj : [.Zend.Optimizer]zend_call_graph.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]sccp.obj : [.Zend.Optimizer]sccp.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]scdf.obj : [.Zend.Optimizer]scdf.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]dce.obj : [.Zend.Optimizer]dce.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]escape_analysis.obj : [.Zend.Optimizer]escape_analysis.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]compact_vars.obj : [.Zend.Optimizer]compact_vars.c $(HEADERS)
+[.$(OBJ_DIR).Zend.Optimizer]zend_dump.obj : [.Zend.Optimizer]zend_dump.c $(HEADERS)

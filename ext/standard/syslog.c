@@ -185,5 +185,11 @@ PHP_FUNCTION(syslog)
 	RETURN_TRUE;
 }
 /* }}} */
-
+#elif defined (__VMS)
+#include "vms/syslog.h"
+void php_openlog(const char *ident, int option, int facility)
+{
+    openlog(ident, option, facility);
+    PG(have_called_openlog) = 1;
+}
 #endif

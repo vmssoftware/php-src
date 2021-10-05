@@ -21,13 +21,12 @@
 
 #ifdef PHP_WIN32
 #include "win32/syslog.h"
+#elif defined (__VMS)
+#include "vms/syslog.h"
 #else
 #include <php_config.h>
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-#endif
-#if defined(__VMS) && !defined(HAVE_SYSLOG_H)
-# include "vms/syslog.h"
 #endif
 #endif
 

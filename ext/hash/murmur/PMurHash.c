@@ -73,7 +73,11 @@ on big endian machines, or a byte-by-byte read if the endianess is unknown.
   #include <stdlib.h>  /* Microsoft put _rotl declaration in here */
   #define ROTL32(x,y)  _rotl(x,y)
 #else
+  #ifdef __VMS
+  #define FORCE_INLINE static
+  #else
   #define FORCE_INLINE static inline __attribute__((always_inline))
+  #endif
   /* gcc recognises this code and generates a rotate instruction for CPUs with one */
   #define ROTL32(x,r)  (((uint32_t)x << r) | ((uint32_t)x >> (32 - r)))
 #endif

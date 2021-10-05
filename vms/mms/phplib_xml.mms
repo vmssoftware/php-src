@@ -13,6 +13,8 @@ CC_FLAGS = $(CC_QUALIFIERS)-
     @ ! defines for nested includes
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).ext.xml] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).ext.xmlreader] | copy SYS$INPUT nl:
+    @ pipe create/dir [.$(OBJ_DIR).ext.xmlwriter] | copy SYS$INPUT nl:
 
 ############################################################################
 # Main target
@@ -25,7 +27,9 @@ TARGET : [.$(OUT_DIR)]phplib_xml.olb
 ############################################################################
 OBJ_FILES = -
 [.$(OBJ_DIR).ext.xml]xml.obj -
-[.$(OBJ_DIR).ext.xml]compat.obj
+[.$(OBJ_DIR).ext.xml]compat.obj -
+[.$(OBJ_DIR).ext.xmlreader]php_xmlreader.obj -
+[.$(OBJ_DIR).ext.xmlwriter]php_xmlwriter.obj
 
 ############################################################################
 # Main target rule
@@ -38,4 +42,6 @@ OBJ_FILES = -
 ############################################################################
 [.$(OBJ_DIR).ext.xml]xml.obj : [.ext.xml]xml.c $(HEADERS)
 [.$(OBJ_DIR).ext.xml]compat.obj : [.ext.xml]compat.c $(HEADERS)
+[.$(OBJ_DIR).ext.xmlreader]php_xmlreader.obj : [.ext.xmlreader]php_xmlreader.c $(HEADERS)
+[.$(OBJ_DIR).ext.xmlwriter]php_xmlwriter.obj : [.ext.xmlwriter]php_xmlwriter.c $(HEADERS)
 

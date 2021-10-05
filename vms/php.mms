@@ -71,6 +71,7 @@ IS_DEBUG=1
 .ENDIF
 
 OUT_DIR = $(OUTDIR).$(CONFIG)
+OBJ_DIR = $(OUT_DIR).OBJ
 
 ############################################################################
 # First for all libraries
@@ -119,7 +120,7 @@ OUT_DIR = $(OUTDIR).$(CONFIG)
 ############################################################################
 # Libraries
 ############################################################################
-PHP_LIB_FILES = -
+PHP_LIBRARIES = -
 [.$(OUT_DIR)]phplib_ctype.olb -
 [.$(OUT_DIR)]phplib_date.olb -
 [.$(OUT_DIR)]phplib_dom.olb -
@@ -151,6 +152,7 @@ PHP_LIB_FILES = -
 # Target
 ############################################################################
 TARGET : -
+$(PHP_LIBRARIES) -
 [.$(OUT_DIR)]php$shr.exe
     ! target built
 
@@ -336,20 +338,26 @@ FILTER_FILES = -
 ############################################################################
 HASH_FILES = -
 [.ext.hash]hash.c -
+[.ext.hash]hash_md.c -
+[.ext.hash]hash_sha.c -
+[.ext.hash]hash_ripemd.c -
+[.ext.hash]hash_haval.c -
+[.ext.hash]hash_tiger.c -
+[.ext.hash]hash_gost.c -
+[.ext.hash]hash_snefru.c -
+[.ext.hash]hash_whirlpool.c -
 [.ext.hash]hash_adler32.c -
 [.ext.hash]hash_crc32.c -
 [.ext.hash]hash_fnv.c -
-[.ext.hash]hash_gost.c -
-[.ext.hash]hash_haval.c -
 [.ext.hash]hash_joaat.c -
-[.ext.hash]hash_md.c -
-[.ext.hash]hash_ripemd.c -
-[.ext.hash]hash_sha.c -
+[.ext.hash]hash_murmur.c -
+[.ext.hash]hash_xxhash.c -
 [.ext.hash]hash_sha3.c -
-[.ext.hash]hash_snefru.c -
-[.ext.hash]hash_tiger.c -
-[.ext.hash]hash_whirlpool.c -
-[.ext.hash]hash_xxhash.c
+[.ext.hash.murmur]PMurHash.c -
+[.ext.hash.murmur]PMurHash128.c -
+[.ext.hash.sha3.generic32lc]KeccakP-1600-inplace32BI.c -
+[.ext.hash.sha3.generic32lc]KeccakHash.c -
+[.ext.hash.sha3.generic32lc]KeccakSponge.c
 
 [.$(OUT_DIR)]phplib_hash.olb : [.vms.mms]phplib_hash.mms $(HASH_FILES) $(HEADERS)
 
@@ -464,6 +472,10 @@ STANDARD_FILES = -
 [.ext.standard]crc32_x86.c -
 [.ext.standard]credits.c -
 [.ext.standard]crypt.c -
+[.ext.standard]crypt_blowfish.c -
+[.ext.standard]crypt_freesec.c -
+[.ext.standard]crypt_sha256.c -
+[.ext.standard]crypt_sha512.c -
 [.ext.standard]css.c -
 [.ext.standard]datetime.c -
 [.ext.standard]dir.c -
@@ -500,6 +512,7 @@ STANDARD_FILES = -
 [.ext.standard]pack.c -
 [.ext.standard]pageinfo.c -
 [.ext.standard]password.c -
+[.ext.standard]php_crypt_r.c -
 [.ext.standard]php_fopen_wrapper.c -
 [.ext.standard]proc_open.c -
 [.ext.standard]quot_print.c -
@@ -520,7 +533,7 @@ STANDARD_FILES = -
 [.ext.standard]uuencode.c -
 [.ext.standard]var.c -
 [.ext.standard]var_unserializer.c -
-[.ext.standard]versioning.c -
+[.ext.standard]versioning.c
 
 [.$(OUT_DIR)]phplib_standard.olb : [.vms.mms]phplib_standard.mms $(STANDARD_FILES) $(HEADERS)
 
@@ -538,7 +551,9 @@ TOKENIZER_FILES = -
 ############################################################################
 XML_FILES = -
 [.ext.xml]xml.c -
-[.ext.xml]compat.c
+[.ext.xml]compat.c -
+[.ext.xmlreader]php_xmlreader.c -
+[.ext.xmlwriter]php_xmlwriter.c
 
 [.$(OUT_DIR)]phplib_xml.olb : [.vms.mms]phplib_xml.mms $(XML_FILES) $(HEADERS)
 
@@ -574,6 +589,7 @@ MAIN_FILES = -
 [.main]spprintf.c -
 [.main]strlcat.c -
 [.main]strlcpy.c -
+[.vms]syslog.c -
 
 [.$(OUT_DIR)]phplib_main.olb : [.vms.mms]phplib_main.mms $(MAIN_FILES) $(HEADERS)
 
@@ -651,14 +667,48 @@ ZEND_FILES = -
 [.Zend]zend_variables.c -
 [.Zend]zend_virtual_cwd.c -
 [.Zend]zend_vm_opcodes.c -
-[.Zend]zend_weakrefs.c
+[.Zend]zend_weakrefs.c -
+[.Zend.Optimizer]zend_optimizer.c -
+[.Zend.Optimizer]pass1.c -
+[.Zend.Optimizer]pass3.c -
+[.Zend.Optimizer]optimize_func_calls.c -
+[.Zend.Optimizer]block_pass.c -
+[.Zend.Optimizer]optimize_temp_vars_5.c -
+[.Zend.Optimizer]nop_removal.c -
+[.Zend.Optimizer]compact_literals.c -
+[.Zend.Optimizer]zend_cfg.c -
+[.Zend.Optimizer]zend_dfg.c -
+[.Zend.Optimizer]dfa_pass.c -
+[.Zend.Optimizer]zend_ssa.c -
+[.Zend.Optimizer]zend_inference.c -
+[.Zend.Optimizer]zend_func_info.c -
+[.Zend.Optimizer]zend_call_graph.c -
+[.Zend.Optimizer]sccp.c -
+[.Zend.Optimizer]scdf.c -
+[.Zend.Optimizer]dce.c -
+[.Zend.Optimizer]escape_analysis.c -
+[.Zend.Optimizer]compact_vars.c -
+[.Zend.Optimizer]zend_dump.c -
 
 [.$(OUT_DIR)]phplib_zend.olb : [.vms.mms]phplib_zend.mms $(ZEND_FILES) $(HEADERS)
 
 ############################################################################
 # php$shr
 ############################################################################
-[.$(OUT_DIR)]php$shr.exe : [.vms.mms]php$shr.mms $(PHP_LIB_FILES)
+[.$(OUT_DIR)]php$shr.exe : [.vms.mms]php$shr.mms $(PHP_LIBRARIES)
+
+############################################################################
+# php client
+############################################################################
+PHP_CLI_FILES = -
+[.sapi.cli]php_cli.c -
+[.sapi.cli]php_http_parser.c -
+[.sapi.cli]php_cli_server.c -
+[.sapi.cli]ps_title.c -
+[.sapi.cli]php_cli_process_title.c -
+[.vms]vms_crtl_init.c
+
+[.$(OUT_DIR)]php.exe : [.vms.mms]php.mms $(PHP_CLI_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

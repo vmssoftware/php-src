@@ -51,7 +51,9 @@ ZEND_API zend_gdbjit_descriptor __jit_debug_descriptor = {
 
 ZEND_API zend_never_inline void __jit_debug_register_code()
 {
+#ifndef __VMS
 	__asm__ __volatile__("");
+#endif
 }
 
 ZEND_API bool zend_gdb_register_code(const void *object, size_t size)

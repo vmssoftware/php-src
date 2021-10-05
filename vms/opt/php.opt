@@ -1,0 +1,10 @@
+php$build_obj:[sapi.cli]php_cli.obj
+php$build_obj:[sapi.cli]php_http_parser.obj
+php$build_obj:[sapi.cli]php_cli_server.obj
+php$build_obj:[sapi.cli]ps_title.obj
+php$build_obj:[sapi.cli]php_cli_process_title.obj
+php$build_obj:[vms]vms_crtl_init.obj
+php$build_out:[000000]php$shr.exe/share
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(get_module=PROCEDURE)

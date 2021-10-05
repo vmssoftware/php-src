@@ -80,7 +80,9 @@
 #ifdef PHP_WIN32
 #include "win32/param.h"
 #else
+#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
+#endif
 #endif
 /* Do this here and now, because struct stat gets re-defined on solaris */
 #include <sys/stat.h>

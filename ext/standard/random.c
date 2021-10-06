@@ -174,7 +174,11 @@ PHPAPI int php_random_bytes(void *bytes, size_t size, zend_bool should_throw)
 		}
 
 		for (read_bytes = 0; read_bytes < size; read_bytes += (size_t) n) {
+#ifdef __VMS
+			n = read(fd, (unsigned char*)bytes + read_bytes, size - read_bytes);
+#else
 			n = read(fd, bytes + read_bytes, size - read_bytes);
+#endif
 			if (n <= 0) {
 				break;
 			}

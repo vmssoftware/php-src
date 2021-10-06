@@ -78,6 +78,14 @@ int inet_aton(const char *, struct in_addr *);
 
 #include "ext/standard/file.h"
 
+#ifndef timercmp
+/* does not work for >= and <= */
+# define timercmp(a, b, CMP)         \
+  (((a)->tv_sec == (b)->tv_sec) ?    \
+  ((a)->tv_usec CMP (b)->tv_usec) :  \
+    ((a)->tv_sec CMP (b)->tv_sec))
+#endif
+
 #ifdef PHP_WIN32
 # include "win32/time.h"
 # define SOCK_ERR INVALID_SOCKET

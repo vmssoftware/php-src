@@ -1271,6 +1271,12 @@ PHPAPI int ap_php_vsnprintf(char *buf, size_t len, const char *format, va_list a
 }
 /* }}} */
 
+#ifdef __VMS
+#   ifndef va_copy
+#       define va_copy(dest,src)       ((dest) = (src))
+#   endif
+#endif
+
 PHPAPI int ap_php_vasprintf(char **buf, const char *format, va_list ap) /* {{{ */
 {
 	va_list ap2;

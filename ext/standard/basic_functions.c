@@ -90,6 +90,10 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 # include "win32/unistd.h"
 #endif
 
+#ifdef __VMS
+#include "vms/syslog.h"
+#endif
+
 #ifndef INADDR_NONE
 #define INADDR_NONE ((zend_ulong) -1)
 #endif

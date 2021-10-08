@@ -27,25 +27,25 @@ TARGET : [.$(OUT_DIR)]php.exe
 ############################################################################
 OBJ_FILES = -
 [.$(OBJ_DIR).sapi.cli]php_cli.obj -
-[.$(OBJ_DIR).sapi.cli]php_http_parser.obj -
-[.$(OBJ_DIR).sapi.cli]php_cli_server.obj -
-[.$(OBJ_DIR).sapi.cli]ps_title.obj -
 [.$(OBJ_DIR).sapi.cli]php_cli_process_title.obj -
+[.$(OBJ_DIR).sapi.cli]php_cli_server.obj -
+[.$(OBJ_DIR).sapi.cli]php_http_parser.obj -
+[.$(OBJ_DIR).sapi.cli]ps_title.obj -
 [.$(OBJ_DIR).vms]vms_crtl_init.obj -
 
 ############################################################################
 # Main target rule
 ############################################################################
 [.$(OUT_DIR)]php.exe : $(OBJ_FILES)
-    LINK/exe=php.exe/threads=upcalls [.vms.opt]php.opt/opt
+    LINK/exe=[.$(OUT_DIR)]php.exe/threads=upcalls [.vms.opt]php.opt/opt
 
 ############################################################################
 # Source files
 ############################################################################
 [.$(OBJ_DIR).sapi.cli]php_cli.obj : [.sapi.cli]php_cli.c $(HEADERS)
-[.$(OBJ_DIR).sapi.cli]php_http_parser.obj : [.sapi.cli]php_http_parser.c $(HEADERS)
-[.$(OBJ_DIR).sapi.cli]php_cli_server.obj : [.sapi.cli]php_cli_server.c $(HEADERS)
-[.$(OBJ_DIR).sapi.cli]ps_title.obj : [.sapi.cli]ps_title.c $(HEADERS)
 [.$(OBJ_DIR).sapi.cli]php_cli_process_title.obj : [.sapi.cli]php_cli_process_title.c $(HEADERS)
+[.$(OBJ_DIR).sapi.cli]php_cli_server.obj : [.sapi.cli]php_cli_server.c $(HEADERS)
+[.$(OBJ_DIR).sapi.cli]php_http_parser.obj : [.sapi.cli]php_http_parser.c $(HEADERS)
+[.$(OBJ_DIR).sapi.cli]ps_title.obj : [.sapi.cli]ps_title.c $(HEADERS)
 [.$(OBJ_DIR).vms]vms_crtl_init.obj : [.vms]vms_crtl_init.c $(HEADERS)
     $(CC) $(CC_FLAGS)/ACCEPT=VAXC_KEYWORDS /OBJECT=$(MMS$TARGET) $(MMS$SOURCE)

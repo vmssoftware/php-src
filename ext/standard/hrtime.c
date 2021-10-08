@@ -49,6 +49,8 @@ static mach_timebase_info_data_t _timerlib_info;
 # include <sys/time.h>
 # include <sys/systemcfg.h>
 
+#elif PHP_HRTIME_PLATFORM_VMS
+
 #endif
 
 #define NANO_IN_SEC 1000000000
@@ -87,6 +89,9 @@ static int _timer_init()
 #elif PHP_HRTIME_PLATFORM_AIX
 
 	/* pass */
+#elif PHP_HRTIME_PLATFORM_VMS
+
+    /* pass */
 
 #else
 	/* Timer unavailable. */

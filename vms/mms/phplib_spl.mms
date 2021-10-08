@@ -29,6 +29,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.spl]spl_array.obj -
 [.$(OBJ_DIR).ext.spl]spl_directory.obj -
 [.$(OBJ_DIR).ext.spl]spl_dllist.obj -
+[.$(OBJ_DIR).ext.spl]spl_engine.obj -
 [.$(OBJ_DIR).ext.spl]spl_exceptions.obj -
 [.$(OBJ_DIR).ext.spl]spl_fixedarray.obj -
 [.$(OBJ_DIR).ext.spl]spl_functions.obj -
@@ -49,6 +50,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).ext.spl]spl_array.obj : [.ext.spl]spl_array.c $(HEADERS)
 [.$(OBJ_DIR).ext.spl]spl_directory.obj : [.ext.spl]spl_directory.c $(HEADERS)
 [.$(OBJ_DIR).ext.spl]spl_dllist.obj : [.ext.spl]spl_dllist.c $(HEADERS)
+[.$(OBJ_DIR).ext.spl]spl_engine.obj : [.ext.spl]spl_engine.c $(HEADERS)
 [.$(OBJ_DIR).ext.spl]spl_exceptions.obj : [.ext.spl]spl_exceptions.c $(HEADERS)
 [.$(OBJ_DIR).ext.spl]spl_fixedarray.obj : [.ext.spl]spl_fixedarray.c $(HEADERS)
 [.$(OBJ_DIR).ext.spl]spl_functions.obj : [.ext.spl]spl_functions.c $(HEADERS)

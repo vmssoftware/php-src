@@ -153,7 +153,8 @@ PHP_LIBRARIES = -
 ############################################################################
 TARGET : -
 $(PHP_LIBRARIES) -
-[.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]php$shr.exe -
+[.$(OUT_DIR)]php.exe
     ! target built
 
 ############################################################################
@@ -447,6 +448,7 @@ SPL_FILES = -
 [.ext.spl]spl_array.c -
 [.ext.spl]spl_directory.c -
 [.ext.spl]spl_dllist.c -
+[.ext.spl]spl_engine.c -
 [.ext.spl]spl_exceptions.c -
 [.ext.spl]spl_fixedarray.c -
 [.ext.spl]spl_functions.c -
@@ -677,10 +679,10 @@ ZEND_FILES = -
 ############################################################################
 PHP_CLI_FILES = -
 [.sapi.cli]php_cli.c -
-[.sapi.cli]php_http_parser.c -
-[.sapi.cli]php_cli_server.c -
-[.sapi.cli]ps_title.c -
 [.sapi.cli]php_cli_process_title.c -
+[.sapi.cli]php_cli_server.c -
+[.sapi.cli]php_http_parser.c -
+[.sapi.cli]ps_title.c -
 [.vms]vms_crtl_init.c
 
 [.$(OUT_DIR)]php.exe : [.vms.mms]php.mms $(PHP_CLI_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe

@@ -4914,6 +4914,8 @@ SYMBOL_VECTOR = (-
 
 !Module zend_exceptions
 SYMBOL_VECTOR = (-
+    zend_ce_division_by_zero_error = DATA, -
+    zend_ce_value_error = DATA, -
 	zend_clear_exception = PROCEDURE, -
 	zend_exception_error = PROCEDURE, -
 	zend_exception_get_default = PROCEDURE, -

@@ -1,0 +1,8 @@
+php$build_obj:[ext.zlib]zlib.obj
+php$build_obj:[ext.zlib]zlib_filter.obj
+php$build_obj:[ext.zlib]zlib_fopen_wrapper.obj
+php$build_out:[000000]php$shr.exe/share
+oss$root:[lib]libz32.olb/lib
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(get_module=PROCEDURE)

@@ -24,6 +24,11 @@
 #include <TSRM/TSRM.h>
 #endif
 
+#ifdef __VMS
+#define CMSG_SPACE _CMSG_SPACE
+#define CMSG_LEN _CMSG_LEN
+#endif
+
 #define MAX_USER_BUFF_SIZE ((size_t)(100*1024*1024))
 #define DEFAULT_BUFF_SIZE 8192
 #define MAX_ARRAY_KEY_SIZE 128

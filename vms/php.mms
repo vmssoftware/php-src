@@ -153,7 +153,11 @@ PHP_LIBRARIES = -
 ############################################################################
 PHP_MODULES = -
 [.$(OUT_DIR)]php-cgi.exe -
-[.$(OUT_DIR)]curl.exe
+[.$(OUT_DIR)]curl.exe -
+[.$(OUT_DIR)]gmp.exe -
+[.$(OUT_DIR)]zlib.exe -
+[.$(OUT_DIR)]sockets.exe -
+[.$(OUT_DIR)]ftp.exe
 
 ############################################################################
 # Target
@@ -712,10 +716,48 @@ PHP_CURL_FILES = -
 [.ext.curl]curl_file.c -
 [.ext.curl]interface.c -
 [.ext.curl]multi.c -
-[.ext.curl]share.c -
-[.vms]vms_crtl_init.c
+[.ext.curl]share.c
 
 [.$(OUT_DIR)]curl.exe : [.vms.mms]curl.mms $(PHP_CURL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# gmp
+############################################################################
+PHP_GMP_FILES = -
+[.ext.gmp]gmp.c
+
+[.$(OUT_DIR)]gmp.exe : [.vms.mms]gmp.mms $(PHP_GMP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# gmp
+############################################################################
+PHP_ZLIB_FILES = -
+[.ext.zlib]zlib.c -
+[.ext.zlib]zlib_filter.c -
+[.ext.zlib]zlib_fopen_wrapper.c
+
+[.$(OUT_DIR)]zlib.exe : [.vms.mms]zlib.mms $(PHP_ZLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# sockets
+############################################################################
+PHP_SOCKETS_FILES = -
+[.ext.sockets]conversions.c -
+[.ext.sockets]multicast.c -
+[.ext.sockets]sendrecvmsg.c -
+[.ext.sockets]sockaddr_conv.c -
+[.ext.sockets]sockets.c
+
+[.$(OUT_DIR)]sockets.exe : [.vms.mms]sockets.mms $(PHP_SOCKETS_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# ftp
+############################################################################
+PHP_FTP_FILES = -
+[.ext.ftp]ftp.c -
+[.ext.ftp]php_ftp.c
+
+[.$(OUT_DIR)]ftp.exe : [.vms.mms]ftp.mms $(PHP_FTP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

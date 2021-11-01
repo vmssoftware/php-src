@@ -5,6 +5,12 @@
 # include "windows_common.h"
 #endif
 
+#ifdef __VMS
+#define CMSG_SPACE _CMSG_SPACE
+#define CMSG_LEN _CMSG_LEN
+#include <stddef.h> 	/* For offsetof() */
+#endif
+
 #include <Zend/zend_llist.h>
 #include <zend_smart_str.h>
 
@@ -1036,7 +1042,11 @@ static void from_zval_write_name(const zval *zname_arr, char *msghdr_c, ser_cont
 
 	from_zval_write_sockaddr_aux(zname_arr, &sockaddr, &sockaddr_len, ctx);
 
+#ifdef __VMS
+	msghdr->msg_name = (char *) sockaddr;
+#else
 	msghdr->msg_name = sockaddr;
+#endif
 	msghdr->msg_namelen = sockaddr_len;
 }
 static void to_zval_read_name(const char *sockaddr_p, zval *zv, res_context *ctx)

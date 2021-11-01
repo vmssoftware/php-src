@@ -1,0 +1,4 @@
+php$build_obj:[sapi.cgi]cgi_main.obj
+php$build_obj:[main]fastcgi.obj
+php$build_obj:[vms]vms_crtl_init.obj
+php$build_out:[000000]php$shr.exe/share

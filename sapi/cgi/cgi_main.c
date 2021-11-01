@@ -137,7 +137,9 @@ static zend_module_entry cgi_module_entry;
 
 static const opt_struct OPTIONS[] = {
 	{'a', 0, "interactive"},
+#ifndef __VMS			/* Cannot be started under FastCGI */
 	{'b', 1, "bindpath"},
+#endif
 	{'C', 0, "no-chdir"},
 	{'c', 1, "php-ini"},
 	{'d', 1, "define"},
@@ -155,7 +157,9 @@ static const opt_struct OPTIONS[] = {
 	{'?', 0, "usage"},/* help alias (both '?' and 'usage') */
 	{'v', 0, "version"},
 	{'z', 1, "zend-extension"},
+#ifndef __VMS
  	{'T', 1, "timing"},
+#endif
 	{'-', 0, NULL} /* end of args */
 };
 
@@ -1026,7 +1030,9 @@ static void php_cgi_usage(char *argv0)
 	php_printf(	"Usage: %s [-q] [-h] [-s] [-v] [-i] [-f <file>]\n"
 				"       %s <file> [args...]\n"
 				"  -a               Run interactively\n"
+#ifndef __VMS
 				"  -b <address:port>|<port> Bind Path for external FASTCGI Server mode\n"
+#endif
 				"  -C               Do not chdir to the script's directory\n"
 				"  -c <path>|<file> Look for php.ini file in this directory\n"
 				"  -n               No php.ini file will be used\n"
@@ -1042,7 +1048,11 @@ static void php_cgi_usage(char *argv0)
 				"  -v               Version number\n"
 				"  -w               Display source with stripped comments and whitespace.\n"
 				"  -z <file>        Load Zend extension <file>.\n"
+#ifndef __VMS
 				"  -T <count>       Measure execution time of script repeated <count> times.\n",
+#else
+,
+#endif
 				prog, prog);
 }
 /* }}} */
@@ -1854,6 +1864,7 @@ int main(int argc, char *argv[])
 				}
 				break;
 			}
+#ifndef __VMS
 			/* if we're started on command line, check to see if
 			 * we are being started as an 'external' fastcgi
 			 * server by accepting a bindpath parameter. */
@@ -1862,6 +1873,7 @@ int main(int argc, char *argv[])
 					bindpath = strdup(php_optarg);
 				}
 				break;
+#endif
 			case 's': /* generate highlighted HTML from source */
 				behavior = PHP_MODE_HIGHLIGHT;
 				break;
@@ -1977,6 +1989,10 @@ consult the installation file that came with this distribution, or visit \n\
 
 		/* Pre-fork or spawn, if required */
 		if (getenv("PHP_FCGI_CHILDREN")) {
+#ifdef __VMS
+            fprintf(stderr, "PHP_FCGI_CHILDREN cannot be used on OpenVMS\n");
+            return FAILURE;
+#endif
 			char * children_str = getenv("PHP_FCGI_CHILDREN");
 			children = atoi(children_str);
 			if (children < 0) {
@@ -2007,6 +2023,7 @@ consult the installation file that came with this distribution, or visit \n\
 			fcgi_set_mgmt_var("FCGI_MAX_REQS",  sizeof("FCGI_MAX_REQS")-1,  "1", sizeof("1")-1);
 		}
 
+#ifndef __VMS
 #ifndef PHP_WIN32
 		if (children) {
 			int running = 0;
@@ -2229,11 +2246,15 @@ parent_loop_end:
 			parent = 0;
 		}
 #endif /* WIN32 */
+#else   /* __VMS */
+	parent = 0;
+#endif
 	}
 
 	zend_first_try {
 		while (!skip_getopt && (c = php_getopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 1, 2)) != -1) {
 			switch (c) {
+#ifndef __VMS
 				case 'T':
 					benchmark = 1;
 					{
@@ -2256,6 +2277,7 @@ parent_loop_end:
 					time(&start);
 #endif
 					break;
+#endif /* __VMS */
 				case 'h':
 				case '?':
 				case PHP_GETOPT_INVALID_ARG:

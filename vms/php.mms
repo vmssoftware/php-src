@@ -149,12 +149,20 @@ PHP_LIBRARIES = -
 [.$(OUT_DIR)]phplib_zend.olb
 
 ############################################################################
+# Executable modules
+############################################################################
+PHP_MODULES = -
+[.$(OUT_DIR)]php-cgi.exe -
+[.$(OUT_DIR)]curl.exe
+
+############################################################################
 # Target
 ############################################################################
 TARGET : -
 $(PHP_LIBRARIES) -
 [.$(OUT_DIR)]php$shr.exe -
-[.$(OUT_DIR)]php.exe
+[.$(OUT_DIR)]php.exe -
+$(PHP_MODULES)
     ! target built
 
 ############################################################################
@@ -568,7 +576,7 @@ MAIN_FILES = -
 [.main]SAPI.c -
 [.main]alloca.c -
 [.main]explicit_bzero.c -
-[.main]fastcgi.c -
+- ![.main]fastcgi.c -
 [.main]fopen_wrappers.c -
 [.main]getopt.c -
 [.main]internal_functions_cli.c -
@@ -686,6 +694,28 @@ PHP_CLI_FILES = -
 [.vms]vms_crtl_init.c
 
 [.$(OUT_DIR)]php.exe : [.vms.mms]php.mms $(PHP_CLI_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# php-cgi
+############################################################################
+PHP_CGI_FILES = -
+[.sapi.cgi]cgi_main.c -
+[.main]fastcgi.c -
+[.vms]vms_crtl_init.c
+
+[.$(OUT_DIR)]php-cgi.exe : [.vms.mms]php-cgi.mms $(PHP_CGI_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# curl
+############################################################################
+PHP_CURL_FILES = -
+[.ext.curl]curl_file.c -
+[.ext.curl]interface.c -
+[.ext.curl]multi.c -
+[.ext.curl]share.c -
+[.vms]vms_crtl_init.c
+
+[.$(OUT_DIR)]curl.exe : [.vms.mms]curl.mms $(PHP_CURL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

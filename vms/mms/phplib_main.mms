@@ -30,7 +30,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).main]SAPI.obj -
 [.$(OBJ_DIR).main]alloca.obj -
 [.$(OBJ_DIR).main]explicit_bzero.obj -
-[.$(OBJ_DIR).main]fastcgi.obj -
+- ![.$(OBJ_DIR).main]fastcgi.obj -
 [.$(OBJ_DIR).main]fopen_wrappers.obj -
 [.$(OBJ_DIR).main]getopt.obj -
 [.$(OBJ_DIR).main]internal_functions_cli.obj -
@@ -64,7 +64,7 @@ OBJ_FILES = -
 [.$(OBJ_DIR).main]SAPI.obj : [.main]SAPI.c $(HEADERS)
 [.$(OBJ_DIR).main]alloca.obj : [.main]alloca.c $(HEADERS)
 [.$(OBJ_DIR).main]explicit_bzero.obj : [.main]explicit_bzero.c $(HEADERS)
-[.$(OBJ_DIR).main]fastcgi.obj : [.main]fastcgi.c $(HEADERS)
+![.$(OBJ_DIR).main]fastcgi.obj : [.main]fastcgi.c $(HEADERS)
 [.$(OBJ_DIR).main]fopen_wrappers.obj : [.main]fopen_wrappers.c $(HEADERS)
 [.$(OBJ_DIR).main]getopt.obj : [.main]getopt.c $(HEADERS)
 [.$(OBJ_DIR).main]internal_functions_cli.obj : [.main]internal_functions_cli.c $(HEADERS)

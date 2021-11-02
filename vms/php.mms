@@ -157,7 +157,12 @@ PHP_MODULES = -
 [.$(OUT_DIR)]gmp.exe -
 [.$(OUT_DIR)]zlib.exe -
 [.$(OUT_DIR)]sockets.exe -
-[.$(OUT_DIR)]ftp.exe
+[.$(OUT_DIR)]ftp.exe -
+[.$(OUT_DIR)]openssl.exe -
+[.$(OUT_DIR)]exif.exe -
+[.$(OUT_DIR)]calendar.exe -
+[.$(OUT_DIR)]ldap.exe -
+[.$(OUT_DIR)]soap.exe
 
 ############################################################################
 # Target
@@ -758,6 +763,60 @@ PHP_FTP_FILES = -
 [.ext.ftp]php_ftp.c
 
 [.$(OUT_DIR)]ftp.exe : [.vms.mms]ftp.mms $(PHP_FTP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# openssl
+############################################################################
+PHP_OPENSSL_FILES = -
+[.ext.openssl]openssl.c -
+[.ext.openssl]xp_ssl.c
+
+[.$(OUT_DIR)]openssl.exe : [.vms.mms]openssl.mms $(PHP_OPENSSL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# exif
+############################################################################
+PHP_EXIF_FILES = -
+[.ext.exif]exif.c
+
+[.$(OUT_DIR)]exif.exe : [.vms.mms]exif.mms $(PHP_EXIF_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# calendar
+############################################################################
+PHP_CALENDAR_FILES = -
+[.ext.calendar]calendar.c -
+[.ext.calendar]cal_unix.c -
+[.ext.calendar]dow.c -
+[.ext.calendar]easter.c -
+[.ext.calendar]french.c -
+[.ext.calendar]gregor.c -
+[.ext.calendar]jewish.c -
+[.ext.calendar]julian.c -
+
+[.$(OUT_DIR)]calendar.exe : [.vms.mms]calendar.mms $(PHP_CALENDAR_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# ldap
+############################################################################
+PHP_ldap_FILES = -
+[.ext.ldap]ldap.c
+
+[.$(OUT_DIR)]ldap.exe : [.vms.mms]ldap.mms $(PHP_ldap_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# soap
+############################################################################
+PHP_SOAP_FILES = -
+[.ext.soap]php_encoding.c -
+[.ext.soap]php_http.c -
+[.ext.soap]php_packet_soap.c -
+[.ext.soap]php_schema.c -
+[.ext.soap]php_sdl.c -
+[.ext.soap]php_xml.c -
+[.ext.soap]soap.c -
+
+[.$(OUT_DIR)]soap.exe : [.vms.mms]soap.mms $(PHP_SOAP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

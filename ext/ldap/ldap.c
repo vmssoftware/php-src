@@ -99,9 +99,13 @@ static void _close_ldap_link(zend_resource *rsrc) /* {{{ */
 {
 	ldap_linkdata *ld = (ldap_linkdata *)rsrc->ptr;
 
+#ifdef __VMS
+    ldap_unbind_s(ld->link);
+#else
 	/* We use ldap_destroy rather than ldap_unbind here, because ldap_unbind
 	 * will skip the destructor entirely if a critical client control is set. */
 	ldap_destroy(ld->link);
+#endif
 
 #if defined(LDAP_API_FEATURE_X_OPENLDAP) && defined(HAVE_3ARG_SETREBINDPROC)
 	zval_ptr_dtor(&ld->rebindproc);
@@ -143,6 +147,9 @@ static void _php_ldap_control_to_array(LDAP *ld, LDAPControl* ctrl, zval* array,
 		add_assoc_bool(array, "iscritical", (ctrl->ldctl_iscritical != 0));
 	}
 
+#ifdef __VMS
+    {
+#else
 	/* If it is a known oid, parse to values */
 	if (strcmp(ctrl->ldctl_oid, LDAP_CONTROL_PASSWORDPOLICYRESPONSE) == 0) {
 		int expire = 0, grace = 0, rc;
@@ -271,6 +278,7 @@ static void _php_ldap_control_to_array(LDAP *ld, LDAPControl* ctrl, zval* array,
 			add_assoc_null(array, "value");
 		}
 	} else {
+#endif
 		if (ctrl->ldctl_value.bv_len) {
 			add_assoc_stringl(array, "value", ctrl->ldctl_value.bv_val, ctrl->ldctl_value.bv_len);
 		} else {
@@ -285,7 +293,9 @@ static int _php_ldap_control_from_array(LDAP *ld, LDAPControl** ctrl, zval* arra
 	zend_string *control_oid;
 	int control_iscritical = 0, rc = LDAP_SUCCESS;
 	char** ldap_attrs = NULL;
+#ifndef __VMS
 	LDAPSortKey** sort_keys = NULL;
+#endif
 	zend_string *tmpstring = NULL, **tmpstrings1 = NULL, **tmpstrings2 = NULL;
 	size_t num_tmpstrings1 = 0, num_tmpstrings2 = 0;
 
@@ -305,7 +315,9 @@ static int _php_ldap_control_from_array(LDAP *ld, LDAPControl** ctrl, zval* arra
 		control_iscritical = 0;
 	}
 
+#ifndef __VMS
 	BerElement *ber = NULL;
+#endif
 	struct berval control_value = { 0L, NULL };
 	int control_value_alloc = 0;
 
@@ -318,6 +330,7 @@ static int _php_ldap_control_from_array(LDAP *ld, LDAPControl** ctrl, zval* arra
 			}
 			control_value.bv_val = ZSTR_VAL(tmpstring);
 			control_value.bv_len = ZSTR_LEN(tmpstring);
+#ifndef __VMS
 		} else if (strcmp(ZSTR_VAL(control_oid), LDAP_CONTROL_PAGEDRESULTS) == 0) {
 			zval* tmp;
 			int pagesize = 1;
@@ -563,14 +576,17 @@ static int _php_ldap_control_from_array(LDAP *ld, LDAPControl** ctrl, zval* arra
 			if (rc != LDAP_SUCCESS) {
 				php_error_docref(NULL, E_WARNING, "Failed to create VLV control value: %s (%d)", ldap_err2string(rc), rc);
 			}
-		} else {
+#endif  /* no __VMS */
+        } else {
 			zend_type_error("%s(): Control OID %s cannot be of type array", get_active_function_name(), ZSTR_VAL(control_oid));
 			rc = -1;
 		}
 	}
 
 	if (rc == LDAP_SUCCESS) {
+#ifndef __VMS
 		rc = ldap_control_create(ZSTR_VAL(control_oid), control_iscritical, &control_value, 1, ctrl);
+#endif
 	}
 
 failure:
@@ -592,15 +608,20 @@ failure:
 		}
 		efree(tmpstrings2);
 	}
+#ifndef __VMS
 	if (control_value.bv_val != NULL && control_value_alloc != 0) {
 		ber_memfree(control_value.bv_val);
 	}
+#endif
+#ifndef __VMS
 	if (ber != NULL) {
 		ber_free(ber, 1);
 	}
+#endif
 	if (ldap_attrs != NULL) {
 		efree(ldap_attrs);
 	}
+#ifndef __VMS
 	if (sort_keys != NULL) {
 		LDAPSortKey** sortp = sort_keys;
 		while (*sortp) {
@@ -610,7 +631,7 @@ failure:
 		efree(sort_keys);
 		sort_keys = NULL;
 	}
-
+#endif
 	if (rc == LDAP_SUCCESS) {
 		return LDAP_SUCCESS;
 	}
@@ -791,7 +812,7 @@ PHP_MINIT_FUNCTION(ldap)
 	REGISTER_LONG_CONSTANT("GSLC_SSL_TWOWAY_AUTH", GSLC_SSL_TWOWAY_AUTH, CONST_PERSISTENT | CONST_CS);
 #endif
 
-#if (LDAP_API_VERSION > 2000)
+#if (LDAP_API_VERSION > 2000) && !defined(__VMS)
 	REGISTER_LONG_CONSTANT("LDAP_OPT_X_TLS_REQUIRE_CERT", LDAP_OPT_X_TLS_REQUIRE_CERT, CONST_PERSISTENT | CONST_CS);
 
 	REGISTER_LONG_CONSTANT("LDAP_OPT_X_TLS_NEVER", LDAP_OPT_X_TLS_NEVER, CONST_PERSISTENT | CONST_CS);
@@ -3057,7 +3078,7 @@ PHP_FUNCTION(ldap_get_option)
 #ifdef LDAP_OPT_X_SASL_USERNAME
 	case LDAP_OPT_X_SASL_USERNAME:
 #endif
-#if (LDAP_API_VERSION > 2000)
+#if (LDAP_API_VERSION > 2000) && !defined(__VMS)
 	case LDAP_OPT_X_TLS_CACERTDIR:
 	case LDAP_OPT_X_TLS_CACERTFILE:
 	case LDAP_OPT_X_TLS_CERTFILE:
@@ -3219,7 +3240,7 @@ PHP_FUNCTION(ldap_set_option)
 	case LDAP_OPT_X_SASL_AUTHCID:
 	case LDAP_OPT_X_SASL_AUTHZID:
 #endif
-#if (LDAP_API_VERSION > 2000)
+#if (LDAP_API_VERSION > 2000) && !defined(__VMS)
 	case LDAP_OPT_X_TLS_CACERTDIR:
 	case LDAP_OPT_X_TLS_CACERTFILE:
 	case LDAP_OPT_X_TLS_CERTFILE:

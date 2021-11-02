@@ -4695,11 +4695,12 @@ SYMBOL_VECTOR = (-
 
 !GLOBALS?
 SYMBOL_VECTOR = (-
-    core_globals = DATA, -
     compiler_globals = DATA, -
+    core_globals = DATA, -
     executor_globals = DATA, -
     file_globals = DATA, -
     module_registry = DATA, -
+    ps_globals = DATA, -
     reflection_class_ptr = DATA, -
     reflection_extension_ptr = DATA, -
     reflection_function_ptr = DATA, -
@@ -4707,7 +4708,10 @@ SYMBOL_VECTOR = (-
     reflection_zend_extension_ptr = DATA, -
     sapi_globals = DATA, -
     sapi_module = DATA, -
+    zend_ce_error = DATA, -
     zend_ce_exception = DATA, -
+    zend_ce_traversable = DATA, -
+    zend_error_cb = DATA, -
     zend_extensions = DATA, -
     zend_one_char_string = DATA, -
     zend_printf = DATA, -

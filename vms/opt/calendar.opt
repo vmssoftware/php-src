@@ -1,0 +1,12 @@
+php$build_obj:[ext.calendar]calendar.obj
+php$build_obj:[ext.calendar]cal_unix.obj
+php$build_obj:[ext.calendar]dow.obj
+php$build_obj:[ext.calendar]easter.obj
+php$build_obj:[ext.calendar]french.obj
+php$build_obj:[ext.calendar]gregor.obj
+php$build_obj:[ext.calendar]jewish.obj
+php$build_obj:[ext.calendar]julian.obj
+php$build_out:[000000]php$shr.exe/share
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(get_module=PROCEDURE)

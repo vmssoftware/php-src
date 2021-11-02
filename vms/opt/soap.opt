@@ -1,0 +1,13 @@
+php$build_obj:[ext.soap]php_encoding.obj
+php$build_obj:[ext.soap]php_http.obj
+php$build_obj:[ext.soap]php_packet_soap.obj
+php$build_obj:[ext.soap]php_schema.obj
+php$build_obj:[ext.soap]php_sdl.obj
+php$build_obj:[ext.soap]php_xml.obj
+php$build_obj:[ext.soap]soap.obj
+php$build_out:[000000]php$shr.exe/share
+oss$root:[lib]libxml2_32.olb/lib
+oss$root:[lib]libz32.olb/lib
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(get_module=PROCEDURE)

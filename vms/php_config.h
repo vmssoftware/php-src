@@ -1478,7 +1478,7 @@
 #define HAVE_RANDOM 1
 
 /* Define to 1 if you have the `RAND_egd' function. */
-#define HAVE_RAND_EGD 1
+#undef HAVE_RAND_EGD
 
 /* Define to 1 if you have the `rand_r' function. */
 #define HAVE_RAND_R 1

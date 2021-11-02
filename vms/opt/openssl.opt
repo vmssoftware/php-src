@@ -1,0 +1,9 @@
+php$build_obj:[ext.openssl]openssl.obj
+php$build_obj:[ext.openssl]xp_ssl.obj
+php$build_out:[000000]php$shr.exe/share
+! requires ssl111
+SSL111$ROOT:[LIB]SSL111$LIBSSL32.OLB/lib
+SSL111$ROOT:[LIB]SSL111$LIBCRYPTO32.OLB/lib
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(get_module=PROCEDURE)

@@ -19,6 +19,8 @@
 #include "ZendAccelerator.h"
 #include "Optimizer/zend_optimizer_internal.h"
 
+#include "zend_type_info.h"
+
 /* The ssa_verify_integrity() function ensures that that certain invariants of the SSA form and
  * CFG are upheld and prints messages to stderr if this is not the case. */
 

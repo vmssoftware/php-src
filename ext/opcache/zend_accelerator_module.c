@@ -33,6 +33,10 @@
 #include "ext/standard/php_filestat.h"
 #include "opcache_arginfo.h"
 
+#ifndef timerclear
+# define timerclear(tvp) ((tvp)->tv_sec = (tvp)->tv_usec = 0)
+#endif
+
 #if HAVE_JIT
 #include "jit/zend_jit.h"
 #endif

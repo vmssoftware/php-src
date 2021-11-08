@@ -4288,6 +4288,12 @@ SYMBOL_VECTOR = (-
 ! Library phplib_zend
 !Module zend
 SYMBOL_VECTOR = (-
+    zend_fopen = DATA, -
+    zend_stream_open_function = DATA, -
+    zend_ticks_function = DATA, -
+    zend_interrupt_function = DATA, -
+    zend_getenv = DATA, -
+    zend_resolve_path = DATA, -
 	_zend_bailout = PROCEDURE, -
 	free_estring = PROCEDURE, -
 	get_zend_version = PROCEDURE, -
@@ -4701,6 +4707,7 @@ SYMBOL_VECTOR = (-
     executor_globals = DATA, -
     file_globals = DATA, -
     module_registry = DATA, -
+    pcre_globals = DATA, -
     ps_globals = DATA, -
     reflection_class_ptr = DATA, -
     reflection_extension_ptr = DATA, -
@@ -4716,12 +4723,13 @@ SYMBOL_VECTOR = (-
     zend_extensions = DATA, -
     zend_one_char_string = DATA, -
     zend_printf = DATA, -
-    zend_string_init_interned = DATA, -
     zend_write = DATA -
 )
 
 !Module zend_compile
 SYMBOL_VECTOR = (-
+    zend_compile_file = DATA, -
+    zend_compile_string = DATA, -
 	do_bind_class = PROCEDURE, -
 	do_bind_function = PROCEDURE, -
 	file_handle_dtor = PROCEDURE, -
@@ -5106,6 +5114,8 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_generators
 SYMBOL_VECTOR = (-
+    zend_ce_generator = DATA, -
+    zend_ce_ClosedGenerator3lglpfg$ = DATA, -
 	zend_generator_check_pl1a0dlfa$ = PROCEDURE, -
 	zend_generator_close = PROCEDURE, -
 	zend_generator_freeze_c3po7p9h$ = PROCEDURE, -
@@ -5281,6 +5291,13 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_interfaces
 SYMBOL_VECTOR = (-
+    zend_ce_aggregate = DATA, -
+    zend_ce_arrayaccess = DATA, -
+    zend_ce_iterator = DATA, -
+    zend_ce_serializable = DATA, -
+    zend_ce_countable = DATA, -
+    zend_ce_stringable = DATA, -
+    zend_ce_internal_iterator = DATA, -
 	zend_call_method = PROCEDURE, -
 	zend_class_serialize_deny = PROCEDURE, -
 	zend_class_unserialize_deny = PROCEDURE, -
@@ -5625,6 +5642,8 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_string
 SYMBOL_VECTOR = (-
+    zend_new_interned_string = DATA, -
+    zend_string_init_interned = DATA, -
 	zend_empty_string = DATA, -
 	zend_hash_func = PROCEDURE, -
 	zend_interned_string_fi21dql7s$ = PROCEDURE, -
@@ -5652,6 +5671,7 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_system_id
 SYMBOL_VECTOR = (-
+    zend_system_id = DATA, -
 	zend_add_system_entropy = PROCEDURE, -
 	zend_finalize_system_id = PROCEDURE, -
 	zend_startup_system_id = PROCEDURE -

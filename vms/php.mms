@@ -168,7 +168,8 @@ PHP_MODULES = -
 [.$(OUT_DIR)]bz2.exe -
 [.$(OUT_DIR)]odbc.exe -
 - ! [.$(OUT_DIR)]wddx.exe
-[.$(OUT_DIR)]xsl.exe
+[.$(OUT_DIR)]xsl.exe -
+[.$(OUT_DIR)]opcache.exe
 
 ############################################################################
 # Target
@@ -867,6 +868,48 @@ XSL_FILES = -
 [.ext.xsl]xsltprocessor.c -
 
 [.$(OUT_DIR)]xsl.exe : [.vms.mms]xsl.mms $(XSL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# opcache
+############################################################################
+OPCACHE_FILES = -
+[.ext.opcache]ZendAccelerator.c -
+[.ext.opcache]shared_alloc_mmap.c -
+[.ext.opcache]shared_alloc_posix.c -
+[.ext.opcache]shared_alloc_shm.c -
+[.ext.opcache]zend_accelerator_blacklist.c -
+[.ext.opcache]zend_accelerator_debug.c -
+[.ext.opcache]zend_accelerator_hash.c -
+[.ext.opcache]zend_accelerator_module.c -
+[.ext.opcache]zend_accelerator_util_funcs.c -
+[.ext.opcache]zend_file_cache.c -
+[.ext.opcache]zend_persist.c -
+[.ext.opcache]zend_persist_calc.c -
+[.ext.opcache]zend_shared_alloc.c -
+[.ext.opcache.Optimizer]block_pass.c -
+[.ext.opcache.Optimizer]compact_literals.c -
+[.ext.opcache.Optimizer]compact_vars.c -
+[.ext.opcache.Optimizer]dce.c -
+[.ext.opcache.Optimizer]dfa_pass.c -
+[.ext.opcache.Optimizer]escape_analysis.c -
+[.ext.opcache.Optimizer]nop_removal.c -
+[.ext.opcache.Optimizer]optimize_func_calls.c -
+[.ext.opcache.Optimizer]optimize_temp_vars_5.c -
+[.ext.opcache.Optimizer]pass1.c -
+[.ext.opcache.Optimizer]pass3.c -
+[.ext.opcache.Optimizer]sccp.c -
+[.ext.opcache.Optimizer]scdf.c -
+[.ext.opcache.Optimizer]ssa_integrity.c -
+[.ext.opcache.Optimizer]zend_call_graph.c -
+[.ext.opcache.Optimizer]zend_cfg.c -
+[.ext.opcache.Optimizer]zend_dfg.c -
+[.ext.opcache.Optimizer]zend_dump.c -
+[.ext.opcache.Optimizer]zend_func_info.c -
+[.ext.opcache.Optimizer]zend_inference.c -
+[.ext.opcache.Optimizer]zend_optimizer.c -
+[.ext.opcache.Optimizer]zend_ssa.c -
+
+[.$(OUT_DIR)]opcache.exe : [.vms.mms]opcache.mms $(OPCACHE_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

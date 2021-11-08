@@ -4818,6 +4818,9 @@ static int accel_finish_startup(void)
 			return SUCCESS;
 		}
 
+#ifdef __VMS
+        {
+#else
 		if (geteuid() == 0) {
 			pid_t pid;
 			struct passwd *pw;
@@ -4876,6 +4879,7 @@ static int accel_finish_startup(void)
 				}
 			}
 		} else {
+#endif
 			if (ZCG(accel_directives).preload_user
 			 && *ZCG(accel_directives).preload_user) {
 				zend_accel_error(ACCEL_LOG_WARNING, "\"opcache.preload_user\" is ignored");

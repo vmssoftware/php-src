@@ -83,7 +83,9 @@
 # ifndef MAXPATHLEN
 #  define MAXPATHLEN     4096
 # endif
+#ifdef HAVE_SYS_PARAM_H
 # include <sys/param.h>
+#endif
 #endif
 
 /*** file locking ***/

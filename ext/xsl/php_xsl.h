@@ -37,7 +37,11 @@ extern zend_module_entry xsl_module_entry;
 #include <libexslt/exsltconfig.h>
 #endif
 
+#ifdef __VMS
+#include "ext/dom/xml_common.h"
+#else
 #include "../dom/xml_common.h"
+#endif
 
 #include <libxslt/extensions.h>
 #include <libxml/xpathInternals.h>

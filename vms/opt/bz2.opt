@@ -1,0 +1,7 @@
+php$build_obj:[ext.bz2]bz2.obj
+php$build_obj:[ext.bz2]bz2_filter.obj
+php$build_out:[000000]php$shr.exe/share
+oss$root:[lib]libbz2_32.olb/lib
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(get_module=PROCEDURE)

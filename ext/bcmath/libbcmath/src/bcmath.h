@@ -56,7 +56,11 @@ typedef struct bc_struct
 #endif
 
 #include "php.h"
+#ifdef __VMS
+#include "ext/bcmath/php_bcmath.h"
+#else
 #include "../../php_bcmath.h"
+#endif
 
 /* The base used in storing the numbers in n_value above.
    Currently this MUST be 10. */

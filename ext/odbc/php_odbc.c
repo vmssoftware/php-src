@@ -1447,9 +1447,11 @@ static void php_odbc_fetch_hash(INTERNAL_FUNCTION_PARAMETERS, int result_type)
 				} else if (result->values[i].vallen == SQL_NULL_DATA) {
 					ZVAL_NULL(&tmp);
 					break;
+#ifndef __VMS
 				} else if (result->values[i].vallen == SQL_NO_TOTAL) {
 					php_error_docref(NULL, E_WARNING, "Cannot get data of column #%d (driver cannot determine length)", i + 1);
 					ZVAL_FALSE(&tmp);
+#endif
 				} else {
 					ZVAL_STRINGL(&tmp, buf, result->values[i].vallen);
 				}
@@ -1459,10 +1461,12 @@ static void php_odbc_fetch_hash(INTERNAL_FUNCTION_PARAMETERS, int result_type)
 				if (result->values[i].vallen == SQL_NULL_DATA) {
 					ZVAL_NULL(&tmp);
 					break;
+#ifndef __VMS
 				} else if (result->values[i].vallen == SQL_NO_TOTAL) {
 					php_error_docref(NULL, E_WARNING, "Cannot get data of column #%d (driver cannot determine length)", i + 1);
 					ZVAL_FALSE(&tmp);
 					break;
+#endif
 				}
 				ZVAL_STRINGL(&tmp, result->values[i].value, result->values[i].vallen);
 				break;
@@ -1607,9 +1611,11 @@ PHP_FUNCTION(odbc_fetch_into)
 				} else if (result->values[i].vallen == SQL_NULL_DATA) {
 					ZVAL_NULL(&tmp);
 					break;
+#ifndef __VMS
 				} else if (result->values[i].vallen == SQL_NO_TOTAL) {
 					php_error_docref(NULL, E_WARNING, "Cannot get data of column #%d (driver cannot determine length)", i + 1);
 					ZVAL_FALSE(&tmp);
+#endif
 				} else {
 					ZVAL_STRINGL(&tmp, buf, result->values[i].vallen);
 				}
@@ -1619,10 +1625,12 @@ PHP_FUNCTION(odbc_fetch_into)
 				if (result->values[i].vallen == SQL_NULL_DATA) {
 					ZVAL_NULL(&tmp);
 					break;
+#ifndef __VMS
 				} else if (result->values[i].vallen == SQL_NO_TOTAL) {
 					php_error_docref(NULL, E_WARNING, "Cannot get data of column #%d (driver cannot determine length)", i + 1);
 					ZVAL_FALSE(&tmp);
 					break;
+#endif
 				}
 				ZVAL_STRINGL(&tmp, result->values[i].value, result->values[i].vallen);
 				break;
@@ -1850,10 +1858,12 @@ PHP_FUNCTION(odbc_result)
 			} else if (result->values[field_ind].vallen == SQL_NULL_DATA) {
 				zend_string_efree(field_str);
 				RETURN_NULL();
+#ifndef __VMS
 			} else if (result->values[field_ind].vallen == SQL_NO_TOTAL) {
 				zend_string_efree(field_str);
 				php_error_docref(NULL, E_WARNING, "Cannot get data of column #%d (driver cannot determine length)", field_ind + 1);
 				RETURN_FALSE;
+#endif
 			}
 			/* Reduce fieldlen by 1 if we have char data. One day we might
 			   have binary strings... */
@@ -1877,9 +1887,11 @@ PHP_FUNCTION(odbc_result)
 		default:
 			if (result->values[field_ind].vallen == SQL_NULL_DATA) {
 				RETURN_NULL();
+#ifndef __VMS
 			} else if (result->values[field_ind].vallen == SQL_NO_TOTAL) {
 				php_error_docref(NULL, E_WARNING, "Cannot get data of column #%d (driver cannot determine length)", field_ind + 1);
 				RETURN_FALSE;
+#endif
 			} else {
 				RETURN_STRINGL(result->values[field_ind].value, result->values[field_ind].vallen);
 			}
@@ -1911,10 +1923,12 @@ PHP_FUNCTION(odbc_result)
 		if (result->values[field_ind].vallen == SQL_NULL_DATA) {
 			efree(field);
 			RETURN_NULL();
+#ifndef __VMS
 		} else if (result->values[field_ind].vallen == SQL_NO_TOTAL) {
 			php_error_docref(NULL, E_WARNING, "Cannot get data of column #%d (driver cannot determine length)", field_ind + 1);
 			efree(field);
 			RETURN_FALSE;
+#endif
 		}
 		/* chop the trailing \0 by outputting only 4095 bytes */
 		PHPWRITE(field,(rc == SQL_SUCCESS_WITH_INFO) ? 4095 : result->values[field_ind].vallen);
@@ -2019,12 +2033,16 @@ PHP_FUNCTION(odbc_result_all)
 						RETURN_FALSE;
 					}
 					if (rc == SQL_SUCCESS_WITH_INFO) {
+#ifndef __VMS
 						if (result->values[i].vallen == SQL_NO_TOTAL) {
 							php_printf("</td></tr></table>");
 							php_error_docref(NULL, E_WARNING, "Cannot get data of column #%zu (driver cannot determine length)", i + 1);
 							efree(buf);
 							RETURN_FALSE;
 						} else {
+#else
+                        {
+#endif
 							PHPWRITE(buf, result->longreadlen);
 						}
 					} else if (rc != SQL_SUCCESS) {
@@ -2043,9 +2061,11 @@ PHP_FUNCTION(odbc_result_all)
 				default:
 					if (result->values[i].vallen == SQL_NULL_DATA) {
 						php_printf("<td>NULL</td>");
+#ifndef __VMS
 					} else if (result->values[i].vallen == SQL_NO_TOTAL) {
 						php_error_docref(NULL, E_WARNING, "Cannot get data of column #%zu (driver cannot determine length)", i + 1);
 						php_printf("<td>FALSE</td>");
+#endif
 					} else {
 						php_printf("<td>%s</td>", result->values[i].value);
 					}

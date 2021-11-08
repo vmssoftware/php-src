@@ -162,7 +162,13 @@ PHP_MODULES = -
 [.$(OUT_DIR)]exif.exe -
 [.$(OUT_DIR)]calendar.exe -
 [.$(OUT_DIR)]ldap.exe -
-[.$(OUT_DIR)]soap.exe
+[.$(OUT_DIR)]soap.exe -
+[.$(OUT_DIR)]bcmath.exe -
+[.$(OUT_DIR)]openvms.exe -
+[.$(OUT_DIR)]bz2.exe -
+[.$(OUT_DIR)]odbc.exe -
+- ! [.$(OUT_DIR)]wddx.exe
+[.$(OUT_DIR)]xsl.exe
 
 ############################################################################
 # Target
@@ -185,35 +191,6 @@ $(PHP_MODULES)
 
 [.zend]zend_config.h : [.vms]zend_config.h
     copy [.vms]zend_config.h [.zend]zend_config.h
-
-############################################################################
-# bcmath
-############################################################################
-BCMATH_FILES = -
-[.ext.bcmath]bcmath.obj -
-[.ext.bcmath.libbcmath.src]add.c -
-[.ext.bcmath.libbcmath.src]compare.c -
-[.ext.bcmath.libbcmath.src]debug.c -
-[.ext.bcmath.libbcmath.src]div.c -
-[.ext.bcmath.libbcmath.src]divmod.c -
-[.ext.bcmath.libbcmath.src]doaddsub.c -
-[.ext.bcmath.libbcmath.src]init.c -
-[.ext.bcmath.libbcmath.src]int2num.c -
-[.ext.bcmath.libbcmath.src]nearzero.c -
-[.ext.bcmath.libbcmath.src]neg.c -
-[.ext.bcmath.libbcmath.src]num2long.c -
-[.ext.bcmath.libbcmath.src]num2str.c -
-[.ext.bcmath.libbcmath.src]output.c -
-[.ext.bcmath.libbcmath.src]raise.c -
-[.ext.bcmath.libbcmath.src]raisemod.c -
-[.ext.bcmath.libbcmath.src]recmul.c -
-[.ext.bcmath.libbcmath.src]rmzero.c -
-[.ext.bcmath.libbcmath.src]sqrt.c -
-[.ext.bcmath.libbcmath.src]str2num.c -
-[.ext.bcmath.libbcmath.src]sub.c -
-[.ext.bcmath.libbcmath.src]zero.c
-
-[.$(OUT_DIR)]bcmath.exe : [.vms.mms]bcmath.mms $(BCMATH_FILES) $(HEADERS)
 
 ############################################################################
 # phplib_date
@@ -717,74 +694,74 @@ PHP_CGI_FILES = -
 ############################################################################
 # curl
 ############################################################################
-PHP_CURL_FILES = -
+CURL_FILES = -
 [.ext.curl]curl_file.c -
 [.ext.curl]interface.c -
 [.ext.curl]multi.c -
 [.ext.curl]share.c
 
-[.$(OUT_DIR)]curl.exe : [.vms.mms]curl.mms $(PHP_CURL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]curl.exe : [.vms.mms]curl.mms $(CURL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # gmp
 ############################################################################
-PHP_GMP_FILES = -
+GMP_FILES = -
 [.ext.gmp]gmp.c
 
-[.$(OUT_DIR)]gmp.exe : [.vms.mms]gmp.mms $(PHP_GMP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]gmp.exe : [.vms.mms]gmp.mms $(GMP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # gmp
 ############################################################################
-PHP_ZLIB_FILES = -
+ZLIB_FILES = -
 [.ext.zlib]zlib.c -
 [.ext.zlib]zlib_filter.c -
 [.ext.zlib]zlib_fopen_wrapper.c
 
-[.$(OUT_DIR)]zlib.exe : [.vms.mms]zlib.mms $(PHP_ZLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]zlib.exe : [.vms.mms]zlib.mms $(ZLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # sockets
 ############################################################################
-PHP_SOCKETS_FILES = -
+SOCKETS_FILES = -
 [.ext.sockets]conversions.c -
 [.ext.sockets]multicast.c -
 [.ext.sockets]sendrecvmsg.c -
 [.ext.sockets]sockaddr_conv.c -
 [.ext.sockets]sockets.c
 
-[.$(OUT_DIR)]sockets.exe : [.vms.mms]sockets.mms $(PHP_SOCKETS_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]sockets.exe : [.vms.mms]sockets.mms $(SOCKETS_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # ftp
 ############################################################################
-PHP_FTP_FILES = -
+FTP_FILES = -
 [.ext.ftp]ftp.c -
 [.ext.ftp]php_ftp.c
 
-[.$(OUT_DIR)]ftp.exe : [.vms.mms]ftp.mms $(PHP_FTP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]ftp.exe : [.vms.mms]ftp.mms $(FTP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # openssl
 ############################################################################
-PHP_OPENSSL_FILES = -
+OPENSSL_FILES = -
 [.ext.openssl]openssl.c -
 [.ext.openssl]xp_ssl.c
 
-[.$(OUT_DIR)]openssl.exe : [.vms.mms]openssl.mms $(PHP_OPENSSL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]openssl.exe : [.vms.mms]openssl.mms $(OPENSSL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # exif
 ############################################################################
-PHP_EXIF_FILES = -
+EXIF_FILES = -
 [.ext.exif]exif.c
 
-[.$(OUT_DIR)]exif.exe : [.vms.mms]exif.mms $(PHP_EXIF_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]exif.exe : [.vms.mms]exif.mms $(EXIF_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # calendar
 ############################################################################
-PHP_CALENDAR_FILES = -
+CALENDAR_FILES = -
 [.ext.calendar]calendar.c -
 [.ext.calendar]cal_unix.c -
 [.ext.calendar]dow.c -
@@ -794,20 +771,20 @@ PHP_CALENDAR_FILES = -
 [.ext.calendar]jewish.c -
 [.ext.calendar]julian.c -
 
-[.$(OUT_DIR)]calendar.exe : [.vms.mms]calendar.mms $(PHP_CALENDAR_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]calendar.exe : [.vms.mms]calendar.mms $(CALENDAR_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # ldap
 ############################################################################
-PHP_ldap_FILES = -
+LDAP_FILES = -
 [.ext.ldap]ldap.c
 
-[.$(OUT_DIR)]ldap.exe : [.vms.mms]ldap.mms $(PHP_ldap_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]ldap.exe : [.vms.mms]ldap.mms $(LDAP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # soap
 ############################################################################
-PHP_SOAP_FILES = -
+SOAP_FILES = -
 [.ext.soap]php_encoding.c -
 [.ext.soap]php_http.c -
 [.ext.soap]php_packet_soap.c -
@@ -816,7 +793,80 @@ PHP_SOAP_FILES = -
 [.ext.soap]php_xml.c -
 [.ext.soap]soap.c -
 
-[.$(OUT_DIR)]soap.exe : [.vms.mms]soap.mms $(PHP_SOAP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]soap.exe : [.vms.mms]soap.mms $(SOAP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# bcmath
+############################################################################
+BCMATH_FILES = -
+[.ext.bcmath]bcmath.c -
+[.ext.bcmath.libbcmath.src]add.c -
+[.ext.bcmath.libbcmath.src]compare.c -
+[.ext.bcmath.libbcmath.src]debug.c -
+[.ext.bcmath.libbcmath.src]div.c -
+[.ext.bcmath.libbcmath.src]divmod.c -
+[.ext.bcmath.libbcmath.src]doaddsub.c -
+[.ext.bcmath.libbcmath.src]init.c -
+[.ext.bcmath.libbcmath.src]int2num.c -
+[.ext.bcmath.libbcmath.src]nearzero.c -
+[.ext.bcmath.libbcmath.src]neg.c -
+[.ext.bcmath.libbcmath.src]num2long.c -
+[.ext.bcmath.libbcmath.src]num2str.c -
+[.ext.bcmath.libbcmath.src]output.c -
+[.ext.bcmath.libbcmath.src]raise.c -
+[.ext.bcmath.libbcmath.src]raisemod.c -
+[.ext.bcmath.libbcmath.src]recmul.c -
+[.ext.bcmath.libbcmath.src]rmzero.c -
+[.ext.bcmath.libbcmath.src]sqrt.c -
+[.ext.bcmath.libbcmath.src]str2num.c -
+[.ext.bcmath.libbcmath.src]sub.c -
+[.ext.bcmath.libbcmath.src]zero.c
+
+[.$(OUT_DIR)]bcmath.exe : [.vms.mms]bcmath.mms $(BCMATH_FILES) $(HEADERS)
+
+############################################################################
+# openvms
+############################################################################
+OPENVMS_FILES = -
+[.ext.openvms]openvms.c -
+[.ext.openvms]cvtfnm.c -
+
+[.$(OUT_DIR)]openvms.exe : [.vms.mms]openvms.mms $(OPENVMS_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# bz2
+############################################################################
+BZ2_FILES = -
+[.ext.bz2]bz2.c -
+[.ext.bz2]bz2_filter.c -
+
+[.$(OUT_DIR)]bz2.exe : [.vms.mms]bz2.mms $(BZ2_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# odbc
+############################################################################
+ODBC_FILES = -
+[.vms]odbc.c -
+[.ext.odbc]php_odbc.c -
+
+[.$(OUT_DIR)]odbc.exe : [.vms.mms]odbc.mms $(ODBC_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+! ############################################################################
+! # wddx
+! ############################################################################
+! WDDX_FILES = -
+! [.ext.wddx]wddx.c -
+
+! [.$(OUT_DIR)]wddx.exe : [.vms.mms]wddx.mms $(WDDX_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# xsl
+############################################################################
+XSL_FILES = -
+[.ext.xsl]php_xsl.c -
+[.ext.xsl]xsltprocessor.c -
+
+[.$(OUT_DIR)]xsl.exe : [.vms.mms]xsl.mms $(XSL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

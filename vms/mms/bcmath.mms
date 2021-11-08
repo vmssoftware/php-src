@@ -2,7 +2,10 @@
 # Must be invoked from php.mms
 ############################################################################
 
-CC_FLAGS = $(CC_QUALIFIERS)/DEFINE=($(CC_DEFINES))/INCLUDE_DIRECTORY=($(CC_INCLUDES))
+CC_FLAGS = -
+$(CC_QUALIFIERS) -
+/DEFINE=($(CC_DEFINES)) -
+/INCLUDE_DIRECTORY=($(CC_INCLUDES),[.ext.bcmath.libbcmath.src])
 
 ############################################################################
 # First

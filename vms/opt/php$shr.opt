@@ -4697,6 +4697,7 @@ SYMBOL_VECTOR = (-
 SYMBOL_VECTOR = (-
     compiler_globals = DATA, -
     core_globals = DATA, -
+    dom_node_class_entry = DATA, -
     executor_globals = DATA, -
     file_globals = DATA, -
     module_registry = DATA, -

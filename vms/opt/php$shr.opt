@@ -2698,6 +2698,19 @@ SYMBOL_VECTOR = (-
 )
 !Module spl_exceptions
 SYMBOL_VECTOR = (-
+    spl_ce_LogicException = DATA, -
+    spl_ce_BadFunctionCallException = DATA, -
+    spl_ce_BadMethodCallException = DATA, -
+    spl_ce_DomainException = DATA, -
+    spl_ce_InvalidArgumentException = DATA, -
+    spl_ce_LengthException = DATA, -
+    spl_ce_OutOfRangeException = DATA, -
+    spl_ce_RuntimeException = DATA, -
+    spl_ce_OutOfBoundsException = DATA, -
+    spl_ce_OverflowException = DATA, -
+    spl_ce_RangeException = DATA, -
+    spl_ce_UnderflowException = DATA, -
+    spl_ce_UnexpectedValueException = DATA, -
 	zm_startup_spl_exceptions = PROCEDURE -
 )
 !Module spl_fixedarray

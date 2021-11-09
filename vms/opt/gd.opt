@@ -1,0 +1,7 @@
+php$build_obj:[ext.gd]gd.obj
+php$build_obj:[ext.gd]gd_compat.obj
+php$build_out:[000000]php$shr.exe/share
+oss$root:[lib]libgd$shr.exe/share
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(get_module=PROCEDURE)

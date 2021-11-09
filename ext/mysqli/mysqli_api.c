@@ -437,7 +437,11 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
 				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
+#ifdef __VMS
+				bind[ofs].length = (unsigned long *)&stmt->result.buf[ofs].output_len;
+#else
 				bind[ofs].length = &stmt->result.buf[ofs].output_len;
+#endif
 				break;
 
 			case MYSQL_TYPE_DATE:
@@ -489,7 +493,11 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
+#ifdef __VMS
+				bind[ofs].length = (unsigned long *)&stmt->result.buf[ofs].output_len;
+#else
 				bind[ofs].length = &stmt->result.buf[ofs].output_len;
+#endif
 				break;
 			}
 			default:
@@ -1220,7 +1228,11 @@ PHP_FUNCTION(mysqli_fetch_lengths)
 	MYSQLI_FETCH_RESOURCE(result, MYSQL_RES *, mysql_result, "mysqli_result", MYSQLI_STATUS_VALID);
 
 	// TODO Warning?
+#ifdef __VMS
+	if (!(ret = (zend_ulong*)mysql_fetch_lengths(result))) {
+#else
 	if (!(ret = mysql_fetch_lengths(result))) {
+#endif
 		RETURN_FALSE;
 	}
 

@@ -26,6 +26,10 @@
 # define ZEND_ENABLE_ZVAL_LONG64 1
 #endif
 
+#ifdef __VMS
+# define ZEND_ENABLE_ZVAL_LONG64 1
+#endif
+
 /* Integer types. */
 #ifdef ZEND_ENABLE_ZVAL_LONG64
 typedef int64_t zend_long;
@@ -79,6 +83,10 @@ typedef int32_t zend_off_t;
 #  define ZEND_STRTOL_PTR strtoll
 #  define ZEND_STRTOUL_PTR strtoull
 #  define ZEND_ABS imaxabs
+#  ifdef __VMS
+#  undef ZEND_ABS
+#  define ZEND_ABS labs
+#  endif
 # endif
 #else
 # define ZEND_STRTOL(s0, s1, base) strtol((s0), (s1), (base))

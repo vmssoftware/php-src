@@ -171,7 +171,13 @@ PHP_MODULES = -
 [.$(OUT_DIR)]xsl.exe -
 [.$(OUT_DIR)]opcache.exe -
 [.$(OUT_DIR)]sysvsem.exe -
-[.$(OUT_DIR)]mbstring.exe
+[.$(OUT_DIR)]mbstring.exe -
+[.$(OUT_DIR)]gd.exe -
+[.$(OUT_DIR)]mysqlnd.exe -
+[.$(OUT_DIR)]sysvshm.exe -
+[.$(OUT_DIR)]tidy.exe -
+[.$(OUT_DIR)]mysqli.exe -
+[.$(OUT_DIR)]pdo_mysql.exe -
 
 ############################################################################
 # Target
@@ -1028,6 +1034,92 @@ $(MBSTRING_FILES) -
 $(HEADERS) -
 [.$(OUT_DIR)]php$shr.exe -
 [.$(OUT_DIR)]libmbfl.olb
+
+############################################################################
+# gd
+############################################################################
+GD_FILES = -
+[.ext.gd]gd.c -
+[.ext.gd]gd_compat.c -
+
+[.$(OUT_DIR)]gd.exe : [.vms.mms]gd.mms -
+$(GD_FILES) -
+$(HEADERS) -
+[.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# mysqlnd
+############################################################################
+MYSQLND_FILES = -
+[.ext.mysqlnd]mysqlnd_alloc.c -
+[.ext.mysqlnd]mysqlnd_auth.c -
+[.ext.mysqlnd]mysqlnd_block_alloc.c -
+[.ext.mysqlnd]mysqlnd_charset.c -
+[.ext.mysqlnd]mysqlnd_commands.c -
+[.ext.mysqlnd]mysqlnd_connection.c -
+[.ext.mysqlnd]mysqlnd_debug.c -
+[.ext.mysqlnd]mysqlnd_driver.c -
+[.ext.mysqlnd]mysqlnd_ext_plugin.c -
+[.ext.mysqlnd]mysqlnd_loaddata.c -
+[.ext.mysqlnd]mysqlnd_plugin.c -
+[.ext.mysqlnd]mysqlnd_protocol_frame_codec.c -
+[.ext.mysqlnd]mysqlnd_ps_codec.c -
+[.ext.mysqlnd]mysqlnd_ps.c -
+[.ext.mysqlnd]mysqlnd_read_buffer.c -
+[.ext.mysqlnd]mysqlnd_result_meta.c -
+[.ext.mysqlnd]mysqlnd_result.c -
+[.ext.mysqlnd]mysqlnd_reverse_api.c -
+[.ext.mysqlnd]mysqlnd_statistics.c -
+[.ext.mysqlnd]mysqlnd_vio.c -
+[.ext.mysqlnd]mysqlnd_wireprotocol.c -
+[.ext.mysqlnd]php_mysqlnd.c -
+
+[.$(OUT_DIR)]mysqlnd.exe : [.vms.mms]mysqlnd.mms -
+$(MYSQLND_FILES) -
+$(HEADERS) -
+[.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# sysvshm
+############################################################################
+SYSVSHM_FILES = -
+[.ext.sysvshm]sysvshm.c -
+
+[.$(OUT_DIR)]sysvshm.exe : [.vms.mms]sysvshm.mms $(SYSVSHM_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# tidy
+############################################################################
+TIDY_FILES = -
+[.ext.tidy]tidy.c -
+
+[.$(OUT_DIR)]tidy.exe : [.vms.mms]tidy.mms $(TIDY_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# mysqli
+############################################################################
+MYSQLI_FILES = -
+[.ext.mysqli]mysqli_api.c -
+[.ext.mysqli]mysqli_driver.c -
+[.ext.mysqli]mysqli_exception.c -
+[.ext.mysqli]mysqli_nonapi.c -
+[.ext.mysqli]mysqli_prop.c -
+[.ext.mysqli]mysqli_report.c -
+[.ext.mysqli]mysqli_result_iterator.c -
+[.ext.mysqli]mysqli_warning.c -
+[.ext.mysqli]mysqli.c -
+
+[.$(OUT_DIR)]mysqli.exe : [.vms.mms]mysqli.mms $(MYSQLI_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# pdo_mysql
+############################################################################
+PDO_MYSQL_FILES = -
+[.ext.pdo_mysql]mysql_driver.c -
+[.ext.pdo_mysql]mysql_statement.c -
+[.ext.pdo_mysql]pdo_mysql.c -
+
+[.$(OUT_DIR)]pdo_mysql.exe : [.vms.mms]pdo_mysql.mms $(PDO_MYSQL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

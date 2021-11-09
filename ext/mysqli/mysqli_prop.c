@@ -274,7 +274,11 @@ static int result_lengths_read(mysqli_object *obj, zval *retval, zend_bool quiet
 	CHECK_STATUS(MYSQLI_STATUS_VALID, quiet);
 	p = (MYSQL_RES *)((MYSQLI_RESOURCE *)(obj->ptr))->ptr;
 	field_count = mysql_num_fields(p);
+#ifdef __VMS
+	if (!p || !field_count || !(ret = (zend_ulong *)mysql_fetch_lengths(p))) {
+#else
 	if (!p || !field_count || !(ret = mysql_fetch_lengths(p))) {
+#endif
 		ZVAL_NULL(retval);
 	} else {
 		zend_ulong i;

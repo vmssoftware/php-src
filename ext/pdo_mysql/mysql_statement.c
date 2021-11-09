@@ -237,7 +237,11 @@ static bool pdo_mysql_stmt_after_execute_prepared(pdo_stmt_t *stmt) {
 
 			S->bound_result[i].buffer = emalloc(S->bound_result[i].buffer_length);
 			S->bound_result[i].is_null = &S->out_null[i];
+#ifdef __VMS
+			S->bound_result[i].length = (unsigned long *)&S->out_length[i];
+#else
 			S->bound_result[i].length = &S->out_length[i];
+#endif
 			S->bound_result[i].buffer_type = MYSQL_TYPE_STRING;
 		}
 
@@ -396,7 +400,11 @@ static int pdo_mysql_stmt_param_hook(pdo_stmt_t *stmt, struct pdo_bound_param_da
 				b = &S->params[param->paramno];
 				param->driver_data = b;
 				b->is_null = &S->in_null[param->paramno];
+#ifdef __VMS
+				b->length = (unsigned long *)&S->in_length[param->paramno];
+#else
 				b->length = &S->in_length[param->paramno];
+#endif
 				/* recall how many parameters have been provided */
 #endif
 				PDO_DBG_RETURN(1);

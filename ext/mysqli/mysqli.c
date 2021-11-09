@@ -1080,7 +1080,11 @@ void php_mysqli_fetch_into_hash_aux(zval *return_value, MYSQL_RES * result, zend
 	}
 
 	array_init(return_value);
+#ifdef __VMS
+	field_len = (zend_ulong	*)mysql_fetch_lengths(result);
+#else
 	field_len = mysql_fetch_lengths(result);
+#endif
 	num_fields = mysql_num_fields(result);
 
 	for (i = 0; i < num_fields; i++) {

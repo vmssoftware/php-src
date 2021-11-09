@@ -169,7 +169,9 @@ PHP_MODULES = -
 [.$(OUT_DIR)]odbc.exe -
 - ! [.$(OUT_DIR)]wddx.exe
 [.$(OUT_DIR)]xsl.exe -
-[.$(OUT_DIR)]opcache.exe
+[.$(OUT_DIR)]opcache.exe -
+[.$(OUT_DIR)]sysvsem.exe -
+[.$(OUT_DIR)]mbstring.exe
 
 ############################################################################
 # Target
@@ -910,6 +912,122 @@ OPCACHE_FILES = -
 [.ext.opcache.Optimizer]zend_ssa.c -
 
 [.$(OUT_DIR)]opcache.exe : [.vms.mms]opcache.mms $(OPCACHE_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# sysvsem
+############################################################################
+SYSVSEM_FILES = -
+[.ext.sysvsem]sysvsem.c -
+
+[.$(OUT_DIR)]sysvsem.exe : [.vms.mms]sysvsem.mms $(SYSVSEM_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# libmbfl
+############################################################################
+LIBMBFL_FILES = -
+[.ext.mbstring.libmbfl.filters]html_entities.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_7bit.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_armscii8.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_ascii.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_base64.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_big5.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_byte2.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_byte4.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp850.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp866.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp932.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp936.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp1251.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp1252.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp1254.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp5022x.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_cp51932.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_euc_cn.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_euc_jp_2004.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_euc_jp_win.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_euc_jp.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_euc_kr.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_euc_tw.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_gb18030.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_htmlent.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_hz.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso2022_jp_ms.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso2022_kr.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso2022jp_2004.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso2022jp_mobile.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_1.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_2.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_3.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_4.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_5.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_6.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_7.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_8.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_9.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_10.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_13.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_14.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_15.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_iso8859_16.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_jis.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_koi8r.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_koi8u.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_qprint.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_sjis_2004.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_sjis_mac.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_sjis_mobile.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_sjis_open.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_sjis.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_tl_jisx0201_jisx0208.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_ucs2.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_ucs4.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_uhc.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_utf7.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_utf7imap.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_utf8_mobile.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_utf8.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_utf16.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_utf32.c -
+[.ext.mbstring.libmbfl.filters]mbfilter_uuencode.c -
+[.ext.mbstring.libmbfl.mbfl]mbfilter_8bit.c -
+[.ext.mbstring.libmbfl.mbfl]mbfilter_pass.c -
+[.ext.mbstring.libmbfl.mbfl]mbfilter_wchar.c -
+[.ext.mbstring.libmbfl.mbfl]mbfilter.c -
+[.ext.mbstring.libmbfl.mbfl]mbfl_convert.c -
+[.ext.mbstring.libmbfl.mbfl]mbfl_encoding.c -
+[.ext.mbstring.libmbfl.mbfl]mbfl_filter_output.c -
+[.ext.mbstring.libmbfl.mbfl]mbfl_ident.c -
+[.ext.mbstring.libmbfl.mbfl]mbfl_language.c -
+[.ext.mbstring.libmbfl.mbfl]mbfl_memory_device.c -
+[.ext.mbstring.libmbfl.mbfl]mbfl_string.c -
+[.ext.mbstring.libmbfl.nls]nls_de.c -
+[.ext.mbstring.libmbfl.nls]nls_en.c -
+[.ext.mbstring.libmbfl.nls]nls_hy.c -
+[.ext.mbstring.libmbfl.nls]nls_ja.c -
+[.ext.mbstring.libmbfl.nls]nls_kr.c -
+[.ext.mbstring.libmbfl.nls]nls_neutral.c -
+[.ext.mbstring.libmbfl.nls]nls_ru.c -
+[.ext.mbstring.libmbfl.nls]nls_tr.c -
+[.ext.mbstring.libmbfl.nls]nls_ua.c -
+[.ext.mbstring.libmbfl.nls]nls_uni.c -
+[.ext.mbstring.libmbfl.nls]nls_zh.c -
+
+[.$(OUT_DIR)]libmbfl.olb : [.vms.mms]libmbfl.mms $(LIBMBFL_FILES)
+
+############################################################################
+# mbstring
+############################################################################
+MBSTRING_FILES = -
+[.ext.mbstring]mbstring.c -
+[.ext.mbstring]mb_gpc.c -
+[.ext.mbstring]php_mbregex.c -
+[.ext.mbstring]php_unicode.c -
+
+[.$(OUT_DIR)]mbstring.exe : [.vms.mms]mbstring.mms -
+$(MBSTRING_FILES) -
+$(HEADERS) -
+[.$(OUT_DIR)]php$shr.exe -
+[.$(OUT_DIR)]libmbfl.olb
 
 ############################################################################
 CLEAN :

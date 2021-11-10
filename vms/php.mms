@@ -1201,5 +1201,15 @@ PDO_DBLIB_FILES = -
 [.$(OUT_DIR)]pdo_dblib.exe : [.vms.mms]pdo_dblib.mms $(PDO_DBLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
+# rdb
+############################################################################
+PDO_DBLIB_FILES = -
+[.ext.rdb]rdb.i -
+[.ext.rdb]db.c -
+[.ext.rdb]sql.sqlmod -
+
+[.$(OUT_DIR)]rdb.exe : [.vms.mms]rdb.mms $(PDO_DBLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
 CLEAN :
     del/tree [.$(OUT_DIR)...]*.*;*

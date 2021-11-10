@@ -178,6 +178,12 @@ PHP_MODULES = -
 [.$(OUT_DIR)]tidy.exe -
 [.$(OUT_DIR)]mysqli.exe -
 [.$(OUT_DIR)]pdo_mysql.exe -
+[.$(OUT_DIR)]shmop.exe -
+[.$(OUT_DIR)]readline.exe -
+[.$(OUT_DIR)]zip.exe -
+[.$(OUT_DIR)]apache.exe -
+[.$(OUT_DIR)]dba.exe -
+[.$(OUT_DIR)]pdo_dblib.exe -
 
 ############################################################################
 # Target
@@ -1120,6 +1126,79 @@ PDO_MYSQL_FILES = -
 [.ext.pdo_mysql]pdo_mysql.c -
 
 [.$(OUT_DIR)]pdo_mysql.exe : [.vms.mms]pdo_mysql.mms $(PDO_MYSQL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# shmop
+############################################################################
+SHMOP_FILES = -
+[.ext.shmop]shmop.c -
+
+[.$(OUT_DIR)]shmop.exe : [.vms.mms]shmop.mms $(SHMOP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# readline
+############################################################################
+READLINE_FILES = -
+[.ext.readline]readline.c -
+[.ext.readline]readline_cli.c -
+
+[.$(OUT_DIR)]readline.exe : [.vms.mms]readline.mms $(READLINE_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# zip
+############################################################################
+ZIP_FILES = -
+[.ext.zip]php_zip.c -
+[.ext.zip]zip_stream.c -
+
+[.$(OUT_DIR)]zip.exe : [.vms.mms]zip.mms $(ZIP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# apache
+############################################################################
+APACHE_FILES = -
+[.sapi.apache2handler]apache_config.c -
+[.sapi.apache2handler]mod_php.c -
+[.sapi.apache2handler]php_functions.c -
+[.sapi.apache2handler]sapi_apache2.c -
+
+[.$(OUT_DIR)]apache.exe : [.vms.mms]apache.mms $(APACHE_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# dba
+############################################################################
+DBA_FILES = -
+[.ext.dba]dba_cdb.c -
+[.ext.dba]dba_db1.c -
+[.ext.dba]dba_db2.c -
+[.ext.dba]dba_db3.c -
+[.ext.dba]dba_db4.c -
+[.ext.dba]dba_dbm.c -
+[.ext.dba]dba_flatfile.c -
+[.ext.dba]dba_gdbm.c -
+[.ext.dba]dba_inifile.c -
+[.ext.dba]dba_lmdb.c -
+[.ext.dba]dba_ndbm.c -
+[.ext.dba]dba_qdbm.c -
+[.ext.dba]dba_tcadb.c -
+[.ext.dba]dba.c -
+[.ext.dba.libcdb]cdb_make.c -
+[.ext.dba.libcdb]cdb.c -
+[.ext.dba.libcdb]uint32.c -
+[.ext.dba.libflatfile]flatfile.c -
+[.ext.dba.libinifile]inifile.c -
+
+[.$(OUT_DIR)]dba.exe : [.vms.mms]dba.mms $(DBA_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# pdo_dblib
+############################################################################
+PDO_DBLIB_FILES = -
+[.ext.pdo_dblib]dblib_driver.c -
+[.ext.pdo_dblib]dblib_stmt.c -
+[.ext.pdo_dblib]pdo_dblib.c -
+
+[.$(OUT_DIR)]pdo_dblib.exe : [.vms.mms]pdo_dblib.mms $(PDO_DBLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

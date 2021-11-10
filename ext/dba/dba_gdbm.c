@@ -27,6 +27,11 @@
 #include GDBM_INCLUDE_FILE
 #endif
 
+#ifdef __VMS
+#include "gdbmerrno.h"
+extern const char * gdbm_strerror(gdbm_error);
+#endif
+
 #define GDBM_DATA dba_gdbm_data *dba = info->dbf
 #define GDBM_GKEY datum gkey; gkey.dptr = (char *) key; gkey.dsize = keylen
 

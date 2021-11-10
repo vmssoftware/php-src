@@ -51,6 +51,10 @@
 
 #include "php_apache.h"
 
+#ifdef __VMS
+#include "vms/syslog.h"
+#endif
+
 /* UnixWare define shutdown to _shutdown, which causes problems later
  * on when using a structure member named shutdown. Since this source
  * file does not use the system call shutdown, it is safe to #undef it.

@@ -346,8 +346,13 @@ static void pdo_dblib_stmt_stringify_col(int coltype, LPBYTE data, DBINT data_le
 	*ptr = zv;
 }
 
+#ifdef __VMS
+static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr,
+	 size_t *len, int *caller_frees)
+#else
 static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr,
 	 zend_ulong *len, int *caller_frees)
+#endif
 {
 
 	pdo_dblib_stmt *S = (pdo_dblib_stmt*)stmt->driver_data;

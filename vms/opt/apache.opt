@@ -1,0 +1,11 @@
+php$build_obj:[sapi.apache2handler]apache_config.obj
+php$build_obj:[sapi.apache2handler]mod_php.obj
+php$build_obj:[sapi.apache2handler]php_functions.obj
+php$build_obj:[sapi.apache2handler]sapi_apache2.obj
+php$build_out:[000000]php$shr.exe/share
+apache$apr_shr/share
+apache$apu_shr/share
+apache$httpd_shr/share
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(php_module=DATA)

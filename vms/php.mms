@@ -181,9 +181,9 @@ PHP_MODULES = -
 [.$(OUT_DIR)]shmop.exe -
 [.$(OUT_DIR)]readline.exe -
 [.$(OUT_DIR)]zip.exe -
-[.$(OUT_DIR)]apache.exe -
+[.$(OUT_DIR)]mod_php.exe -
 [.$(OUT_DIR)]dba.exe -
-[.$(OUT_DIR)]pdo_dblib.exe -
+[.$(OUT_DIR)]pdo_dblib_freetds.exe -
 
 ############################################################################
 # Target
@@ -1154,15 +1154,15 @@ ZIP_FILES = -
 [.$(OUT_DIR)]zip.exe : [.vms.mms]zip.mms $(ZIP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
-# apache
+# mod_php
 ############################################################################
-APACHE_FILES = -
+MOD_PHP_FILES = -
 [.sapi.apache2handler]apache_config.c -
 [.sapi.apache2handler]mod_php.c -
 [.sapi.apache2handler]php_functions.c -
 [.sapi.apache2handler]sapi_apache2.c -
 
-[.$(OUT_DIR)]apache.exe : [.vms.mms]apache.mms $(APACHE_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]mod_php.exe : [.vms.mms]mod_php.mms $(MOD_PHP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # dba
@@ -1191,14 +1191,14 @@ DBA_FILES = -
 [.$(OUT_DIR)]dba.exe : [.vms.mms]dba.mms $(DBA_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
-# pdo_dblib
+# pdo_dblib_freetds
 ############################################################################
 PDO_DBLIB_FILES = -
 [.ext.pdo_dblib]dblib_driver.c -
 [.ext.pdo_dblib]dblib_stmt.c -
 [.ext.pdo_dblib]pdo_dblib.c -
 
-[.$(OUT_DIR)]pdo_dblib.exe : [.vms.mms]pdo_dblib.mms $(PDO_DBLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]pdo_dblib_freetds.exe : [.vms.mms]pdo_dblib_freetds.mms $(PDO_DBLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # rdb

@@ -55,7 +55,7 @@ PHP_LIBRARIES = -
 # Main target rule
 ############################################################################
 [.$(OUT_DIR)]php$shr.exe : $(PHP_LIBRARIES)
-    LINK/share=[.$(OUT_DIR)]php$shr.exe [.vms.opt]php$shr.opt/opt
+    $(LINK) $(LINK_FLAGS) /SHARE=$(MMS$TARGET) [.vms.opt]php$shr.opt/opt
 
 ############################################################################
 # Source files

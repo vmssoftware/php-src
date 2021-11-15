@@ -19,8 +19,8 @@ CC_FLAGS = $(CC_QUALIFIERS)-
 ############################################################################
 # Main target
 ############################################################################
-TARGET : [.$(OUT_DIR)]apache.exe
-    ! apache is built
+TARGET : [.$(OUT_DIR)]mod_php.exe
+    ! mod_php is built
 
 ############################################################################
 # Object files
@@ -34,8 +34,8 @@ OBJ_FILES = -
 ############################################################################
 # Main target rule
 ############################################################################
-[.$(OUT_DIR)]apache.exe : $(OBJ_FILES)
-    $(LINK) $(LINK_FLAGS) /SHARE=$(MMS$TARGET) [.vms.opt]apache.opt/opt
+[.$(OUT_DIR)]mod_php.exe : $(OBJ_FILES)
+    $(LINK) $(LINK_FLAGS) /SHARE=$(MMS$TARGET) [.vms.opt]mod_php.opt/opt
 
 ############################################################################
 # Source files

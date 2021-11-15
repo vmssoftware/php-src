@@ -22,8 +22,8 @@ CC_FLAGS = $(CC_QUALIFIERS)-
 ############################################################################
 # Main target
 ############################################################################
-TARGET : [.$(OUT_DIR)]pdo_dblib.exe
-    ! pdo_dblib is built
+TARGET : [.$(OUT_DIR)]pdo_dblib_freetds.exe
+    ! pdo_dblib_freetds is built
 
 ############################################################################
 # Object files
@@ -36,8 +36,8 @@ OBJ_FILES = -
 ############################################################################
 # Main target rule
 ############################################################################
-[.$(OUT_DIR)]pdo_dblib.exe : $(OBJ_FILES)
-    $(LINK) $(LINK_FLAGS) /SHARE=$(MMS$TARGET) [.vms.opt]pdo_dblib.opt/opt
+[.$(OUT_DIR)]pdo_dblib_freetds.exe : $(OBJ_FILES)
+    $(LINK) $(LINK_FLAGS) /SHARE=$(MMS$TARGET) [.vms.opt]pdo_dblib_freetds.opt/opt
 
 ############################################################################
 # Source files

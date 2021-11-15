@@ -37,7 +37,7 @@ OBJ_FILES = -
 # Main target rule
 ############################################################################
 [.$(OUT_DIR)]php.exe : $(OBJ_FILES)
-    LINK/exe=[.$(OUT_DIR)]php.exe/threads=upcalls [.vms.opt]php.opt/opt
+    $(LINK) $(LINK_FLAGS) /EXE=$(MMS$TARGET)/threads=upcalls [.vms.opt]php.opt/opt
 
 ############################################################################
 # Source files

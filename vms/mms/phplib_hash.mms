@@ -2,8 +2,8 @@
 # Must be invoked from php.mms
 ############################################################################
 
-CC_FLAGS = -
-$(CC_QUALIFIERS)-
+CC_FLAGS = $(CC_QUALIFIERS)-
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
 /DEFINE=($(CC_DEFINES),"KeccakP200_excluded","KeccakP400_excluded","KeccakP800_excluded")-
 /INCLUDE_DIRECTORY=($(CC_INCLUDES),[.ext.hash.xxhash],[.ext.hash.sha3.generic32lc])
 

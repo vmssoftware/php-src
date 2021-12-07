@@ -5034,6 +5034,9 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_execute_API
 SYMBOL_VECTOR = (-
+    zend_autoload = DATA, -
+    zend_execute_ex = DATA, -
+    zend_execute_internal = DATA, -
 	_call_user_function_impl = PROCEDURE, -
 	empty_fcall_info = DATA, -
 	empty_fcall_info_cache = DATA, -
@@ -5103,6 +5106,7 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_gc
 SYMBOL_VECTOR = (-
+    gc_collect_cycles = DATA, -
 	gc_enable = PROCEDURE, -
 	gc_enabled = PROCEDURE, -
 	gc_globals_ctor = PROCEDURE, -
@@ -5295,6 +5299,7 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_ini_scanner
 SYMBOL_VECTOR = (-
+    ini_scanner_globals = DATA, -
 	ini_lex = PROCEDURE, -
 	shutdown_ini_scanner = PROCEDURE, -
 	zend_ini_open_file_for_scanning = PROCEDURE, -
@@ -5346,6 +5351,7 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_language_scanner
 SYMBOL_VECTOR = (-
+    language_scanner_globals = DATA, -
 	compile_file = PROCEDURE, -
 	compile_filename = PROCEDURE, -
 	compile_string = PROCEDURE, -
@@ -5367,6 +5373,7 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_list
 SYMBOL_VECTOR = (-
+    le_index_ptr = DATA, -
 	list_entry_destructor = PROCEDURE, -
 	plist_entry_destructor = PROCEDURE, -
 	zend_clean_module_rsrc_dtors = PROCEDURE, -
@@ -5731,6 +5738,7 @@ SYMBOL_VECTOR = (-
 )
 !Module zend_virtual_cwd
 SYMBOL_VECTOR = (-
+    cwd_globals = DATA, -
 	realpath_cache_clean = PROCEDURE, -
 	realpath_cache_del = PROCEDURE, -
 	realpath_cache_get_buckets = PROCEDURE, -

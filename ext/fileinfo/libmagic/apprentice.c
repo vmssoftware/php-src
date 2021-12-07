@@ -3123,7 +3123,11 @@ internal_loaded:
 		nentries = (uint32_t)(st.sb.st_size / sizeof(struct magic));
 		entries = (uint32_t)(st.sb.st_size / sizeof(struct magic));
 		if ((zend_off_t)(entries * sizeof(struct magic)) != st.sb.st_size) {
+#ifdef __VMS
+			file_error(ms, 0, "Size of `%s' %llu is not a multiple of %u",
+#else
 			file_error(ms, 0, "Size of `%s' %llu is not a multiple of %zu",
+#endif
 				dbname, (unsigned long long)st.sb.st_size,
 				sizeof(struct magic));
 			goto error;

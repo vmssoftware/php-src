@@ -718,20 +718,46 @@ protected int
 file_parse_guid(const char *s, uint64_t *guid)
 {
 	struct guid *g = CAST(struct guid *, guid);
+#ifndef __VMS
 	return sscanf(s,
 	    "%8x-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx",
 	    &g->data1, &g->data2, &g->data3, &g->data4[0], &g->data4[1],
 	    &g->data4[2], &g->data4[3], &g->data4[4], &g->data4[5],
 	    &g->data4[6], &g->data4[7]) == 11 ? 0 : -1;
+#else
+    int tmp[11];
+	if (11 == sscanf(s,
+	    "%8x-%4x-%4x-%2x%2x-%2x%2x%2x%2x%2x%2x",
+	    tmp, tmp+1, tmp+2, tmp+3, tmp+4, tmp+5,
+        tmp+6, tmp+7, tmp+8, tmp+9, tmp+10)) {
+        g->data1 = (uint32_t)tmp[0];
+        g->data2 = (uint16_t)tmp[1];
+        g->data3 = (uint16_t)tmp[2];
+        g->data4[0] = (uint8_t)tmp[3];
+        g->data4[1] = (uint8_t)tmp[4];
+        g->data4[2] = (uint8_t)tmp[5];
+        g->data4[3] = (uint8_t)tmp[6];
+        g->data4[4] = (uint8_t)tmp[7];
+        g->data4[5] = (uint8_t)tmp[8];
+        g->data4[6] = (uint8_t)tmp[9];
+        g->data4[7] = (uint8_t)tmp[10];
+        return 0;
+    }
+    return -1;
+#endif
 }
 
 protected int
 file_print_guid(char *str, size_t len, const uint64_t *guid)
 {
 	const struct guid *g = CAST(const struct guid *, guid);
-
+#ifdef __VMS
+	return snprintf(str, len, "%.8X-%.4hX-%.4hX-%.2X%.2X-"
+	    "%.2X%.2X%.2X%.2X%.2X%.2X",
+#else
 	return snprintf(str, len, "%.8X-%.4hX-%.4hX-%.2hhX%.2hhX-"
 	    "%.2hhX%.2hhX%.2hhX%.2hhX%.2hhX%.2hhX",
+#endif
 	    g->data1, g->data2, g->data3, g->data4[0], g->data4[1],
 	    g->data4[2], g->data4[3], g->data4[4], g->data4[5],
 	    g->data4[6], g->data4[7]);

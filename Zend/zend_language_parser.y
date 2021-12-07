@@ -1552,7 +1552,11 @@ static YYSIZE_T zend_yytnamerr(char *yyres, const char *yystr)
 		/* Also, "unexpected invalid character" sounds a bit redundant */
 		if (tokcontent_len == 1 && strcmp(yystr, "\"invalid character\"") == 0) {
 			if (yyres) {
+#ifdef __VMS
+				snprintf(buffer, sizeof(buffer), "character 0x%02X", *tokcontent);
+#else
 				snprintf(buffer, sizeof(buffer), "character 0x%02hhX", *tokcontent);
+#endif
 				yystpcpy(yyres, buffer);
 			}
 			return sizeof("character 0x00")-1;

@@ -3,6 +3,7 @@
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)-
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
 /DEFINE=($(CC_DEFINES))-
 /INCLUDE_DIRECTORY=($(CC_INCLUDES)-
 )

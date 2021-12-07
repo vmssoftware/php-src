@@ -1183,6 +1183,13 @@ PHP_FUNCTION(proc_open)
 	childHandle = pi.hProcess;
 	child       = pi.dwProcessId;
 	CloseHandle(pi.hThread);
+#elif defined(__VMS)
+
+    child = -1;
+    close_all_descriptors(descriptors, ndesc);
+    php_error_docref(NULL, E_WARNING, "Fork failed: %s", strerror(errno));
+    goto exit_fail;
+
 #elif HAVE_FORK
 	/* the Unix way */
 	child = fork();

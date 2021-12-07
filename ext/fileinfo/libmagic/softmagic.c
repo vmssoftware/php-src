@@ -1654,7 +1654,11 @@ mget(struct magic_set *ms, struct magic *m, const struct buffer *b,
 				return 0;
 			}
 			if ((ms->flags & MAGIC_DEBUG) != 0)
+#ifdef __VMS
+				fprintf(stderr, "indirect offs=%lli\n", off);
+#else
 				fprintf(stderr, "indirect offs=%jd\n", off);
+#endif
 		}
 		switch (in_type = cvt_flip(m->in_type, flip)) {
 		case FILE_BYTE:

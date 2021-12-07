@@ -66,6 +66,10 @@
 #  define INT64_T_FORMAT "I64"
 #  define INTMAX_T_FORMAT "I64"
 # endif
+#elif defined(__VMS)
+# define SIZE_T_FORMAT "i"
+# define INT64_T_FORMAT "lli"
+# define INTMAX_T_FORMAT "i"
 #else
 # define SIZE_T_FORMAT "z"
 # define INT64_T_FORMAT "ll"

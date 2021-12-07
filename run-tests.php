@@ -170,7 +170,7 @@ function main(): void
 
     define('TEST_PHP_SRCDIR', getcwd());
 
-    check_proc_open_function_exists();
+    // check_proc_open_function_exists();
 
     // If timezone is not set, use UTC.
     if (ini_get('date.timezone') == '') {
@@ -1240,6 +1240,8 @@ function system_with_timeout(
     if ($captureStdErr) {
         $descriptorspec[2] = ['pipe', 'w'];
     }
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+    echo $commandline;
     $proc = proc_open($commandline, $descriptorspec, $pipes, TEST_PHP_SRCDIR, $bin_env, ['suppress_errors' => true]);
 
     if (!$proc) {

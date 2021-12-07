@@ -7,17 +7,18 @@
 ############################################################################
 CC_QUALIFIERS = -
 /NAMES=(AS_IS,SHORTENED) -
-/WARNINGS=(WARNINGS=ALL, DISABLE=(-
-    EXTRASEMI,-
-    MACROREDEF,-
-    QUESTCOMPARE1,-
-    QUESTCOMPARE,-
-    UNSTRUCTMEM,-
-    DUPTYPESPEC,-
-    INTCONSTTRUNC,-
-    TOOFEWACTUALS,-
-    UNDEFESCAP)) -
 /ACCEPT=NOVAXC_KEYWORDS
+
+CC_DISABLE_WARN = -
+    EXTRASEMI-
+    ,MACROREDEF-
+    ,QUESTCOMPARE1-
+    ,QUESTCOMPARE-
+    ,UNSTRUCTMEM-
+    ,DUPTYPESPEC-
+    ,INTCONSTTRUNC-
+    ,TOOFEWACTUALS-
+    ,UNDEFESCAP-
 
 ############################################################################
 # Compiler definitions
@@ -94,11 +95,13 @@ OBJ_DIR = $(OUT_DIR).OBJ
 .MMS.OLB
     @ ! use the '-' symbol bacause of bug in MMS while updating library
     - $(MMS)/DESCR=$(MMS$SOURCE)-
+    /EXT-
     /RULES=[.vms.mms]rules.mms-
     /MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
         "IS_DEBUG=$(IS_DEBUG)",-
         "CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
+        "CC_DISABLE_WARN_G=$(CC_DISABLE_WARN)",-
         "CC_DEFINES_G=$(CC_DEFINES)",-
         "CC_INCLUDES_G=$(CC_INCLUDES)",-
         "HEADERS_G=$(HEADERS)"-
@@ -107,11 +110,13 @@ OBJ_DIR = $(OUT_DIR).OBJ
 .MMS.EXE
     @ ! use the '-' symbol bacause of bug in MMS while updating library
     - $(MMS)/DESCR=$(MMS$SOURCE)-
+    /EXT-
     /RULES=[.vms.mms]rules.mms-
     /MACRO=( -
         "OUT_DIR=$(OUT_DIR)", -
         "IS_DEBUG=$(IS_DEBUG)",-
         "CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
+        "CC_DISABLE_WARN_G=$(CC_DISABLE_WARN)",-
         "CC_DEFINES_G=$(CC_DEFINES)",-
         "CC_INCLUDES_G=$(CC_INCLUDES)",-
         "HEADERS_G=$(HEADERS)"-
@@ -184,6 +189,9 @@ PHP_MODULES = -
 [.$(OUT_DIR)]mod_php.exe -
 [.$(OUT_DIR)]dba.exe -
 [.$(OUT_DIR)]pdo_dblib_freetds.exe -
+[.$(OUT_DIR)]rdb.exe -
+[.$(OUT_DIR)]dlm.exe -
+[.$(OUT_DIR)]rec.exe -
 
 ############################################################################
 # Target
@@ -1203,12 +1211,30 @@ PDO_DBLIB_FILES = -
 ############################################################################
 # rdb
 ############################################################################
-PDO_DBLIB_FILES = -
+RDB_FILES = -
 [.ext.rdb]rdb.i -
 [.ext.rdb]db.c -
 [.ext.rdb]sql.sqlmod -
 
-[.$(OUT_DIR)]rdb.exe : [.vms.mms]rdb.mms $(PDO_DBLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]rdb.exe : [.vms.mms]rdb.mms $(RDB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# dlm
+############################################################################
+DLM_FILES = -
+[.ext.dlm]dlm.i -
+[.ext.dlm]dlm.c -
+
+[.$(OUT_DIR)]dlm.exe : [.vms.mms]dlm.mms $(DLM_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+
+############################################################################
+# rec
+############################################################################
+REC_FILES = -
+[.ext.dtr]rec.i -
+[.ext.dtr]rec.c -
+
+[.$(OUT_DIR)]rec.exe : [.vms.mms]rec.mms $(REC_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

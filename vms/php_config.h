@@ -2237,10 +2237,10 @@
 #define PHP_BLOWFISH_CRYPT 1
 
 /* PHP build date */
-#define PHP_BUILD_DATE "2015-06-24"
+#define PHP_BUILD_DATE __DATE__
 
 /* Define if your system has fork/vfork/CreateProcess */
-/* #define PHP_CAN_SUPPORT_PROC_OPEN 1 */
+#define PHP_CAN_SUPPORT_PROC_OPEN 1
 
 /* Whether the system supports extended DES salt */
 #define PHP_EXT_DES_CRYPT 1

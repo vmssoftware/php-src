@@ -1,0 +1,7 @@
+php$build_obj:[ext.dlm]dlm.obj
+php$build_obj:[ext.dlm]dlm_wrap.obj
+php$build_out:[000000]php$shr.exe/share
+sql$user/lib
+GSMATCH=LEQUAL,1,0
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR=(get_module=PROCEDURE)

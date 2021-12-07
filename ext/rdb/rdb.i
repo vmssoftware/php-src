@@ -13,10 +13,9 @@
       int len = rdb_ncol( arg1 );
       array_init($result);
       for ( int i = 0; i < len; ++i, ++stringarray ) {
-        zval *data;
-        MAKE_STD_ZVAL(data);
-        ZVAL_STRINGL(data, *stringarray, 1);
-        zend_hash_next_index_insert( HASH_OF($result), &data, sizeof(zval *), NULL );
+        zval data;
+        ZVAL_STRINGL(&data, *stringarray, 1);
+        zend_hash_next_index_insert( HASH_OF($result), &data);
       }
     }
 }

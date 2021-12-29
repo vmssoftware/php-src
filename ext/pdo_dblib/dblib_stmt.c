@@ -19,6 +19,21 @@
 # include "config.h"
 #endif
 
+#ifdef __VMS
+#  ifndef INT64_MAX
+#    define INT64_MAX       (9223372036854775807LL)
+#  endif
+#  ifndef INT64_MIN
+#	 define INT64_MIN       (-9223372036854775807LL-1)
+#  endif
+#  ifndef __CONCAT
+#    define __CONCAT(value, suffix) value ## suffix
+#  endif
+#  ifndef UINT64_C
+#    define UINT64_C(value) __CONCAT(value, ULL)
+#  endif
+#endif
+
 #include "php.h"
 #include "php_ini.h"
 #include "ext/standard/php_string.h"

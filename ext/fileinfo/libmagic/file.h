@@ -559,6 +559,9 @@ size_t strlcat(char *, const char *, size_t);
 char *strcasestr(const char *, const char *);
 #endif
 #ifndef HAVE_GETLINE
+#ifdef __VMS
+#undef getline
+#endif
 ssize_t getline(char **, size_t *, FILE *);
 ssize_t getdelim(char **, size_t *, int, FILE *);
 #endif

@@ -15,6 +15,10 @@ LINK_FLAGS = /NODEBUG/NOMAP/NOTRACEBACK
 CC_INCLUDES = $(CC_INCLUDES_G)
 OBJ_DIR = $(OUT_DIR).OBJ
 
+.IF X86_HOST
+CC_DEFINES = $(CC_DEFINES),"i386"
+.ENDIF
+
 ############################################################################
 # Suffixes/Rules
 ############################################################################

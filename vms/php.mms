@@ -6,19 +6,19 @@
 # Compiler qualifiers
 ############################################################################
 CC_QUALIFIERS = -
-/NAMES=(AS_IS,SHORTENED) -
+/NAMES=(AS_IS,SHORTENED)-
 /ACCEPT=NOVAXC_KEYWORDS
 
 CC_DISABLE_WARN = -
-    EXTRASEMI-
-    ,MACROREDEF-
-    ,QUESTCOMPARE1-
-    ,QUESTCOMPARE-
-    ,UNSTRUCTMEM-
-    ,DUPTYPESPEC-
-    ,INTCONSTTRUNC-
-    ,TOOFEWACTUALS-
-    ,UNDEFESCAP-
+EXTRASEMI-
+,MACROREDEF-
+,QUESTCOMPARE1-
+,QUESTCOMPARE-
+,UNSTRUCTMEM-
+,DUPTYPESPEC-
+,INTCONSTTRUNC-
+,TOOFEWACTUALS-
+,UNDEFESCAP-
 
 ############################################################################
 # Compiler definitions
@@ -38,9 +38,9 @@ BIND_4_COMPAT=1
 # Include folders
 ############################################################################
 CC_INCLUDES = -
-[], -
-[.main], -
-[.tsrm], -
+[],-
+[.main],-
+[.tsrm],-
 [.zend]
 
 ############################################################################
@@ -77,7 +77,18 @@ OBJ_DIR = $(OUT_DIR).OBJ
 ############################################################################
 # First for all libraries
 ############################################################################
+
+.IF X86_HOST
+X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
+X86_LIBDEF = define/nolog sys$library X86$LIBRARY
+.ELSE
+X86_START =
+X86_LIBDEF =
+.ENDIF
+
 .FIRST
+    $(X86_START)
+    $(X86_LIBDEF)
     @ ! defines for nested includes
     @ define streams [.main.streams]
     ! names
@@ -95,32 +106,34 @@ OBJ_DIR = $(OUT_DIR).OBJ
 .MMS.OLB
     @ ! use the '-' symbol bacause of bug in MMS while updating library
     - $(MMS)/DESCR=$(MMS$SOURCE)-
-    /EXT-
-    /RULES=[.vms.mms]rules.mms-
-    /MACRO=( -
-        "OUT_DIR=$(OUT_DIR)", -
-        "IS_DEBUG=$(IS_DEBUG)",-
-        "CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
-        "CC_DISABLE_WARN_G=$(CC_DISABLE_WARN)",-
-        "CC_DEFINES_G=$(CC_DEFINES)",-
-        "CC_INCLUDES_G=$(CC_INCLUDES)",-
-        "HEADERS_G=$(HEADERS)"-
-    )
+/EXT-
+/RULES=[.vms.mms]rules.mms-
+/MACRO=(-
+"OUT_DIR=$(OUT_DIR)", -
+"IS_DEBUG=$(IS_DEBUG)",-
+"CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
+"CC_DISABLE_WARN_G=$(CC_DISABLE_WARN)",-
+"CC_DEFINES_G=$(CC_DEFINES)",-
+"CC_INCLUDES_G=$(CC_INCLUDES)",-
+"HEADERS_G=$(HEADERS)",-
+"X86_HOST=$(X86_HOST)"-
+)
 
 .MMS.EXE
     @ ! use the '-' symbol bacause of bug in MMS while updating library
     - $(MMS)/DESCR=$(MMS$SOURCE)-
-    /EXT-
-    /RULES=[.vms.mms]rules.mms-
-    /MACRO=( -
-        "OUT_DIR=$(OUT_DIR)", -
-        "IS_DEBUG=$(IS_DEBUG)",-
-        "CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
-        "CC_DISABLE_WARN_G=$(CC_DISABLE_WARN)",-
-        "CC_DEFINES_G=$(CC_DEFINES)",-
-        "CC_INCLUDES_G=$(CC_INCLUDES)",-
-        "HEADERS_G=$(HEADERS)"-
-    )
+/EXT-
+/RULES=[.vms.mms]rules.mms-
+/MACRO=(-
+"OUT_DIR=$(OUT_DIR)", -
+"IS_DEBUG=$(IS_DEBUG)",-
+"CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
+"CC_DISABLE_WARN_G=$(CC_DISABLE_WARN)",-
+"CC_DEFINES_G=$(CC_DEFINES)",-
+"CC_INCLUDES_G=$(CC_INCLUDES)",-
+"HEADERS_G=$(HEADERS)",-
+"X86_HOST=$(X86_HOST)"-
+)
 
 ############################################################################
 # Libraries
@@ -181,17 +194,22 @@ PHP_MODULES = -
 [.$(OUT_DIR)]mysqlnd.exe -
 [.$(OUT_DIR)]sysvshm.exe -
 [.$(OUT_DIR)]tidy.exe -
-[.$(OUT_DIR)]mysqli.exe -
-[.$(OUT_DIR)]pdo_mysql.exe -
 [.$(OUT_DIR)]shmop.exe -
 [.$(OUT_DIR)]readline.exe -
 [.$(OUT_DIR)]zip.exe -
 [.$(OUT_DIR)]mod_php.exe -
 [.$(OUT_DIR)]dba.exe -
 [.$(OUT_DIR)]pdo_dblib_freetds.exe -
-[.$(OUT_DIR)]rdb.exe -
 [.$(OUT_DIR)]dlm.exe -
 [.$(OUT_DIR)]rec.exe -
+
+.IF X86_HOST
+.ELSE
+PHP_MODULES = $(PHP_MODULES) -
+[.$(OUT_DIR)]pdo_mysql.exe -
+[.$(OUT_DIR)]mysqli.exe -
+[.$(OUT_DIR)]rdb.exe
+.ENDIF
 
 ############################################################################
 # Target

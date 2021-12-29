@@ -40,10 +40,6 @@
 # include "win32/winutil.h"
 #endif
 
-#ifdef __VMS
-#pragma names save
-#pragma names uppercase
-#endif
 /* OpenSSL includes */
 #include <openssl/evp.h>
 #include <openssl/bn.h>
@@ -60,9 +56,6 @@
 #include <openssl/ssl.h>
 #include <openssl/pkcs12.h>
 #include <openssl/cms.h>
-#ifdef __VMS
-#pragma names restore
-#endif
 
 /* Common */
 #include <time.h>

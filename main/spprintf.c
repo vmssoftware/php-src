@@ -587,7 +587,11 @@ static void xbuf_format_converter(void *xbuf, zend_bool is_char, const char *fmt
 				case 'E':
 					switch(modifier) {
 						case LM_LONG_DOUBLE:
+					#if defined(__VMS) && defined(i386)
+							goto fmt_error;
+					#else
 							fp_num = (double) va_arg(ap, long double);
+					#endif
 							break;
 						case LM_STD:
 							fp_num = va_arg(ap, double);
@@ -630,7 +634,11 @@ static void xbuf_format_converter(void *xbuf, zend_bool is_char, const char *fmt
 				case 'H':
 					switch(modifier) {
 						case LM_LONG_DOUBLE:
+					#if defined(__VMS) && defined(i386)
+							goto fmt_error;
+					#else
 							fp_num = (double) va_arg(ap, long double);
+					#endif
 							break;
 						case LM_STD:
 							fp_num = va_arg(ap, double);

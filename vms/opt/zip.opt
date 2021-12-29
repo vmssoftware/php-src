@@ -3,8 +3,8 @@ php$build_obj:[ext.zip]zip_stream.obj
 php$build_out:[000000]php$shr.exe/share
 oss$root:[lib]libzip.olb/lib
 oss$root:[lib]libz32.olb/lib
-SSL111$ROOT:[LIB]SSL111$LIBSSL32.OLB/lib
-SSL111$ROOT:[LIB]SSL111$LIBCRYPTO32.OLB/lib
+SSL111_LIBSSL32/lib
+SSL111_LIBCRYPTO32/lib
 GSMATCH=LEQUAL,1,0
 CASE_SENSITIVE=YES
 SYMBOL_VECTOR=(get_module=PROCEDURE)

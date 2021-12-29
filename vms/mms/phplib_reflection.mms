@@ -10,7 +10,17 @@ CC_FLAGS = $(CC_QUALIFIERS)-
 ############################################################################
 # First
 ############################################################################
+.IF X86_HOST
+X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
+X86_LIBDEF = define/nolog sys$library X86$LIBRARY
+.ELSE
+X86_START =
+X86_LIBDEF =
+.ENDIF
+
 .FIRST
+    $(X86_START)
+    $(X86_LIBDEF)
     @ ! defines for nested includes
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).ext.reflection] | copy SYS$INPUT nl:

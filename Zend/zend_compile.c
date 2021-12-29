@@ -5503,7 +5503,11 @@ void zend_compile_match(znode *result, zend_ast *ast)
 	case_node.u.op.var = get_temporary_variable();
 
 	uint32_t num_conds = count_match_conds(arms);
+#ifdef __VMS
+	zend_bool can_use_jumptable = can_match_use_jumptable(arms);
+#else
 	zend_uchar can_use_jumptable = can_match_use_jumptable(arms);
+#endif
 	zend_bool uses_jumptable = can_use_jumptable && num_conds >= 2;
 	HashTable *jumptable = NULL;
 	uint32_t *jmpnz_opnums = NULL;

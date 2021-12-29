@@ -4,8 +4,8 @@ php$build_obj:[ext.pdo_dblib]pdo_dblib.obj
 php$build_out:[000000]php$shr.exe/share
 oss$root:[lib]libsybdb.olb/lib
 oss$root:[lib]libtds.olb/lib
-SSL111$ROOT:SSL111$LIBSSL32.OLB/LIB
-SSL111$ROOT:SSL111$LIBCRYPTO32.OLB/LIB
+SSL111_LIBSSL32/lib
+SSL111_LIBCRYPTO32/lib
 GSMATCH=LEQUAL,1,0
 CASE_SENSITIVE=YES
 SYMBOL_VECTOR=(get_module=PROCEDURE)

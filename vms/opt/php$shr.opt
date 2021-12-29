@@ -29,7 +29,7 @@ oss$root:[lib]libxml2_32.olb/lib
 oss$root:[lib]libz32.olb/lib
 oss$root:[lib]libsqlite32.olb/lib
 !
-sys$common:[tcpip$lib]tcpip$lib.olb/lib
+TCPIP_LIB/lib
 !
 GSMATCH=LEQUAL,1,0
 CASE_SENSITIVE=YES

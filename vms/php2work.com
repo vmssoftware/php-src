@@ -19,7 +19,7 @@ $ str_pat = prj_ptt + ".main.streams]"
 $ tsr_pat = prj_ptt + ".tsrm]"
 $ znd_pat = prj_ptt + ".Zend]"
 $
-$ @'com_pat'php_names.com
+$ @'com_pat'php_names.com 'P2'
 $
 $ pipe delete/tree php$root:[000000...]*.*;* | copy SYS$INPUT nl:
 $

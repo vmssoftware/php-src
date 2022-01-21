@@ -315,6 +315,11 @@ extern void virtual_cwd_main_cwd_init(uint8_t);
 #endif
 
 #ifdef __VMS
+#	undef 	VCWD_GETCWD
+#	define 	VCWD_GETCWD(buff, size) getcwd(buff, size, 0)
+#endif
+
+#ifdef __VMS
 #define VCWD_CHDIR_FILE(path) virtual_chdir_file(path, (void*)chdir)
 #else
 #define VCWD_CHDIR_FILE(path) virtual_chdir_file(path, chdir)

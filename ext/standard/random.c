@@ -83,9 +83,52 @@ PHP_MSHUTDOWN_FUNCTION(random)
 }
 /* }}} */
 
+#ifdef __VMS
+//
+// Credits:
+// ========
+//	License: Creative Commons CC0
+//		http://creativecommons.org/publicdomain/zero/1.0/legalcode
+//	Author:	James Sainsbury
+//		toves@sdf.lonestar.org
+//
+#include <timers.h>
+
+static
+int getentropy (char entropy[], size_t entropy_size)
+{
+	static unsigned short   seed[3] = {0};
+    static unsigned short   seed_init = 0;
+
+    if (!seed_init) {
+        struct timespec tv;
+        getclock(TIMEOFDAY, &tv);
+        memcpy(&seed, ((unsigned char*)&tv) + (sizeof(tv) - sizeof(seed)), sizeof(seed));
+        seed_init = 1;
+    }
+
+    int         i = 0;
+    long int    r = jrand48(seed);
+    int         step = sizeof(r);
+    while ((i+step) < entropy_size) {
+        memcpy (&entropy[i], &r, step);
+        r = jrand48(seed);
+        i += step;
+    }
+    memcpy (&entropy[i], &r, (entropy_size - i));
+    return 0;
+}
+#endif
+
+
 /* {{{ php_random_bytes */
 PHPAPI int php_random_bytes(void *bytes, size_t size, zend_bool should_throw)
 {
+#ifdef __VMS
+	getentropy(bytes, size);
+	return SUCCESS;
+#endif
+
 #ifdef PHP_WIN32
 	/* Defer to CryptGenRandom on Windows */
 	if (php_win32_get_random_bytes(bytes, size) == FAILURE) {

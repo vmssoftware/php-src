@@ -77,6 +77,11 @@ $ backup 'com_pat'php.ini-dev php$root:[etc]
 $ backup 'com_pat'php.ini-prod php$root:[etc]
 $ backup 'com_pat'php.ini php$root:[etc]
 $
+$ backup 'com_pat'php$pcsi_preconfigure.com php$root:[000000]
+$ backup 'com_pat'php$define_root.com php$root:[000000]
+$ backup 'com_pat'php$startup.com php$root:[000000]
+$ backup 'com_pat'php$shutdown.com php$root:[000000]
+$
 $ backup 'com_pat'cacert.pem php$root:[etc]
 $
 $ backup 'opc_pat'*.h php$root:[include.ext.opcahce]

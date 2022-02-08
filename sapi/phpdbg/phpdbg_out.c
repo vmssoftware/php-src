@@ -596,7 +596,11 @@ static int format_converter(register buffy *odp, const char *fmt, zend_bool esca
 
 					switch(modifier) {
 						case LM_LONG_DOUBLE:
+						#if defined(__VMS) && defined(i386)
+							goto fmt_error;
+						#else
 							fp_num = (double) va_arg(ap, long double);
+						#endif
 							break;
 						case LM_STD:
 							fp_num = va_arg(ap, double);
@@ -636,7 +640,11 @@ static int format_converter(register buffy *odp, const char *fmt, zend_bool esca
 				case 'H':
 					switch(modifier) {
 						case LM_LONG_DOUBLE:
+						#if defined(__VMS) && defined(i386)
+							goto fmt_error;
+						#else
 							fp_num = (double) va_arg(ap, long double);
+						#endif
 							break;
 						case LM_STD:
 							fp_num = va_arg(ap, double);

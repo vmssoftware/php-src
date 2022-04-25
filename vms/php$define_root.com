@@ -3,9 +3,9 @@ $
 $! Create php$define_logicals.com such that php$root is corectly defined
 $!
 $
-$ if "" .nes. f$trnlnm("php$verify") then set verify
+$ com_nam = f$environment("procedure")
 $
-$ root = f$trnlmn("pcsi$destination") - "]" + "php.]"
+$ root = com_nam - "]" + ".]"
 $
 $ open/write fd sys$common:[sysmgr]php$define_logicals.com
 $ write fd "$ define/system/trans=concealed php$root ''root'"

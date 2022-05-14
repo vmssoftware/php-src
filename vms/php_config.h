@@ -1641,7 +1641,9 @@
 #define HAVE_SOCKETS 1
 
 /* Whether you have socklen_t */
+#ifdef __SOCKLEN_T
 #define HAVE_SOCKLEN_T 1
+#endif
 
 /* */
 /* #undef HAVE_SOLID */

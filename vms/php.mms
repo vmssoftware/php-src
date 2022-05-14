@@ -41,7 +41,8 @@ CC_INCLUDES = -
 [],-
 [.main],-
 [.tsrm],-
-[.zend]
+[.zend],-
+[.vms.include]
 
 ############################################################################
 # Headers
@@ -197,18 +198,32 @@ PHP_MODULES = -
 [.$(OUT_DIR)]shmop.exe -
 [.$(OUT_DIR)]readline.exe -
 [.$(OUT_DIR)]zip.exe -
-[.$(OUT_DIR)]mod_php.exe -
 [.$(OUT_DIR)]dba.exe -
-[.$(OUT_DIR)]pdo_dblib_freetds.exe -
-[.$(OUT_DIR)]dlm.exe -
+[.$(OUT_DIR)]pdo_dblib_freetds.exe
+
+.IF APACHE_INSTALLED
+PHP_MODULES = $(PHP_MODULES) -
+[.$(OUT_DIR)]mod_php.exe
+.ENDIF
+
+.IF NEW_SWIG_INSTALLED
+PHP_MODULES = $(PHP_MODULES) -
 [.$(OUT_DIR)]rec.exe -
+[.$(OUT_DIR)]dlm.exe
+.ENDIF
 
 .IF X86_HOST
 .ELSE
+
+.IF NEW_SWIG_INSTALLED
+PHP_MODULES = $(PHP_MODULES) -
+[.$(OUT_DIR)]rdb.exe
+.ENDIF
+
 PHP_MODULES = $(PHP_MODULES) -
 [.$(OUT_DIR)]pdo_mysql.exe -
-[.$(OUT_DIR)]mysqli.exe -
-[.$(OUT_DIR)]rdb.exe
+[.$(OUT_DIR)]mysqli.exe
+
 .ENDIF
 
 ############################################################################

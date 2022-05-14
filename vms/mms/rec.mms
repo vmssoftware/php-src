@@ -6,7 +6,8 @@ CC_FLAGS = $(CC_QUALIFIERS)-
 /WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
 /DEFINE=($(CC_DEFINES)-
 )-
-/INCLUDE_DIRECTORY=($(CC_INCLUDES)-
+/INCLUDE_DIRECTORY=($(CC_INCLUDES),-
+[.ext.dtr]-
 )
 
 ############################################################################
@@ -52,11 +53,12 @@ OBJ_FILES = -
 ############################################################################
 # Source files
 ############################################################################
-[.ext.dtr]rec_wrap.c : [.ext.dtr]rec.i
+[.$(OBJ_DIR).ext.dtr]rec_wrap.c : [.ext.dtr]rec.i
     set def [.ext.dtr]
     swig -php rec.i
     purge/nolog
     set def [--]
+    copy [.ext.dtr]rec_wrap.c [.$(OBJ_DIR).ext.dtr]
 
 [.$(OBJ_DIR).ext.dtr]rec.obj : [.ext.dtr]rec.c $(HEADERS)
-[.$(OBJ_DIR).ext.dtr]rec_wrap.obj : [.ext.dtr]rec_wrap.c $(HEADERS)
+[.$(OBJ_DIR).ext.dtr]rec_wrap.obj : [.$(OBJ_DIR).ext.dtr]rec_wrap.c $(HEADERS)

@@ -6,7 +6,8 @@ CC_FLAGS = $(CC_QUALIFIERS)-
 /WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
 /DEFINE=($(CC_DEFINES)-
 )-
-/INCLUDE_DIRECTORY=($(CC_INCLUDES)-
+/INCLUDE_DIRECTORY=($(CC_INCLUDES),-
+[.ext.rdb]-
 )
 
 ############################################################################
@@ -54,14 +55,15 @@ OBJ_FILES = -
 ############################################################################
 # Source files
 ############################################################################
-[.ext.rdb]rdb_wrap.c : [.ext.rdb]rdb.i
+[.$(OBJ_DIR).ext.rdb]rdb_wrap.c : [.ext.rdb]rdb.i
     set def [.ext.rdb]
     swig -php rdb.i
     purge/nolog
     set def [--]
+    copy [.ext.rdb]rdb_wrap.c [.$(OBJ_DIR).ext.rdb]
 
 [.$(OBJ_DIR).ext.rdb]db.obj : [.ext.rdb]db.c $(HEADERS)
-[.$(OBJ_DIR).ext.rdb]rdb_wrap.obj : [.ext.rdb]rdb_wrap.c $(HEADERS)
+[.$(OBJ_DIR).ext.rdb]rdb_wrap.obj : [.$(OBJ_DIR).ext.rdb]rdb_wrap.c $(HEADERS)
 [.$(OBJ_DIR).ext.rdb]sql.obj : [.ext.rdb]sql.sqlmod
     sqlmod [.ext.rdb]sql.sqlmod
     rename sql.obj [.$(OBJ_DIR).ext.rdb]sql.obj

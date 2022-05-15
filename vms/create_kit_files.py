@@ -123,7 +123,7 @@ end product;
 =prompt VSI Software Inc.
 
 1 'NOTICE
-=prompt (C) Copyright 2021 VMS Software Inc.
+=prompt (C) Copyright 2022 VMS Software Inc.
 
 1 NO_MIN_VMS
 =prompt Minimum OpenVMS software version not found on this system, abort instalation

@@ -3,33 +3,14 @@
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)-
-/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN))) -
 /DEFINE=($(CC_DEFINES))-
 /INCLUDE_DIRECTORY=($(CC_INCLUDES)-
 ,oss$root:[include]-
 )
 
-############################################################################
-# First
-############################################################################
-.IF X86_HOST
-X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
-X86_LIBDEF = define/nolog sys$library X86$LIBRARY
-X86_OSSDEF = define/nolog/trans=concealed oss$root DSA22:[OSS.X86.]
-SSL111_LIBSSL32 = define/nolog SSL111_LIBSSL32 DSA22:[OSS.X86.LIB]SSL111$LIBSSL32.OLB
-SSL111_LIBCRYPTO32 = define/nolog SSL111_LIBCRYPTO32 DSA22:[OSS.X86.LIB]SSL111$LIBCRYPTO32.OLB
-.ELSE
-X86_START =
-X86_LIBDEF =
-X86_OSSDEF = 
-SSL111_LIBSSL32 = define/nolog SSL111_LIBSSL32 SSL111$ROOT:[LIB]SSL111$LIBSSL32.OLB
-SSL111_LIBCRYPTO32 = define/nolog SSL111_LIBCRYPTO32 SSL111$ROOT:[LIB]SSL111$LIBCRYPTO32.OLB
-.ENDIF
-
 .FIRST
-    $(X86_START)
-    $(X86_LIBDEF)
-    $(X86_OSSDEF)
+    $(SETUP_COMPILER)
     @ ! defines for nested includes
     @ define openssl SSL111$INCLUDE:
     @ define lib oss$root:[include]
@@ -37,8 +18,6 @@ SSL111_LIBCRYPTO32 = define/nolog SSL111_LIBCRYPTO32 SSL111$ROOT:[LIB]SSL111$LIB
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).ext.zip] | copy SYS$INPUT nl:
     !
-    @ $(SSL111_LIBSSL32)
-    @ $(SSL111_LIBCRYPTO32)
 
 ############################################################################
 # Main target

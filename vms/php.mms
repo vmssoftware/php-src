@@ -47,7 +47,7 @@ CC_INCLUDES = -
 ############################################################################
 # Headers
 ############################################################################
-HEADERS = -
+CC_HEADERS = -
 [.main]php_config.h -
 [.zend]zend_config.h -
 [.main]build-defs.h
@@ -68,10 +68,6 @@ OUTDIR = OUT
 CONFIG = DEBUG
 .ENDIF
 
-.IF $(FINDSTRING DEBUG, $(CONFIG)) .EQ DEBUG
-IS_DEBUG=1
-.ENDIF
-
 OUT_DIR = $(OUTDIR).$(CONFIG)
 OBJ_DIR = $(OUT_DIR).OBJ
 
@@ -79,17 +75,34 @@ OBJ_DIR = $(OUT_DIR).OBJ
 # First for all libraries
 ############################################################################
 
-.IF X86_HOST
-X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
-X86_LIBDEF = define/nolog sys$library X86$LIBRARY
+.IF X86_64_CROSS
+SETUP_COMPILER = @[.vms]setup_cross_x86_compiler.com
+CC_DEFINES = $(CC_DEFINES),""i386""
+LINK_FLAGS =
+.ELSIF X86_64
+SETUP_COMPILER = @[.vms]setup_native_x86_compiler.com
+CC_DEFINES = $(CC_DEFINES),""i386""
+CC_QUALIFIERS=$(CC_QUALIFIERS)/SWITCHES=NOCHECK
+LINK_FLAGS=/SEGMENT=CODE=P0
 .ELSE
-X86_START =
-X86_LIBDEF =
+SETUP_COMPILER = @[.vms]setup_compiler.com
+LINK_FLAGS =
+.ENDIF
+
+.IF $(FINDSTRING DEBUG, $(CONFIG)) .EQ DEBUG
+CC_QUALIFIERS = $(CC_QUALIFIERS)/DEBUG/NOOPTIMIZE/LIST=$(MMS$TARGET_NAME)/SHOW=ALL
+CC_DEFINES = $(CC_DEFINES),_DEBUG
+! LINK_FLAGS = $(LINK_FLAGS)/NODEBUG/MAP=$(MMS$TARGET_NAME)/TRACE/DSF=$(MMS$TARGET_NAME).DSF
+LINK_FLAGS = $(LINK_FLAGS)/DEBUG/MAP=$(MMS$TARGET_NAME)
+.ELSE
+CC_QUALIFIERS = $(CC_QUALIFIERS)/NODEBUG/OPTIMIZE/NOLIST
+CC_DEFINES = $(CC_DEFINES),_NDEBUG
+LINK_FLAGS = $(LINK_FLAGS)/NODEBUG/NOMAP/NOTRACEBACK
 .ENDIF
 
 .FIRST
-    $(X86_START)
-    $(X86_LIBDEF)
+    set verify
+    $(SETUP_COMPILER)
     @ ! defines for nested includes
     @ define streams [.main.streams]
     ! names
@@ -110,14 +123,15 @@ X86_LIBDEF =
 /EXT-
 /RULES=[.vms.mms]rules.mms-
 /MACRO=(-
+"X86_64_CROSS=$(X86_64_CROSS)",-
 "OUT_DIR=$(OUT_DIR)", -
-"IS_DEBUG=$(IS_DEBUG)",-
-"CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
-"CC_DISABLE_WARN_G=$(CC_DISABLE_WARN)",-
-"CC_DEFINES_G=$(CC_DEFINES)",-
-"CC_INCLUDES_G=$(CC_INCLUDES)",-
-"HEADERS_G=$(HEADERS)",-
-"X86_HOST=$(X86_HOST)"-
+"CC_QUALIFIERS=$(CC_QUALIFIERS)",-
+"CC_DISABLE_WARN=$(CC_DISABLE_WARN)",-
+"CC_DEFINES=$(CC_DEFINES)",-
+"CC_INCLUDES=$(CC_INCLUDES)",-
+"CC_HEADERS=$(CC_HEADERS)",-
+"LINK_FLAGS=$(LINK_FLAGS)",-
+"SETUP_COMPILER=$(SETUP_COMPILER)"-
 )
 
 .MMS.EXE
@@ -126,14 +140,15 @@ X86_LIBDEF =
 /EXT-
 /RULES=[.vms.mms]rules.mms-
 /MACRO=(-
+"X86_64_CROSS=$(X86_64_CROSS)",-
 "OUT_DIR=$(OUT_DIR)", -
-"IS_DEBUG=$(IS_DEBUG)",-
-"CC_QUALIFIERS_G=$(CC_QUALIFIERS)",-
-"CC_DISABLE_WARN_G=$(CC_DISABLE_WARN)",-
-"CC_DEFINES_G=$(CC_DEFINES)",-
-"CC_INCLUDES_G=$(CC_INCLUDES)",-
-"HEADERS_G=$(HEADERS)",-
-"X86_HOST=$(X86_HOST)"-
+"CC_QUALIFIERS=$(CC_QUALIFIERS)",-
+"CC_DISABLE_WARN=$(CC_DISABLE_WARN)",-
+"CC_DEFINES=$(CC_DEFINES)",-
+"CC_INCLUDES=$(CC_INCLUDES)",-
+"CC_HEADERS=$(CC_HEADERS)",-
+"LINK_FLAGS=$(LINK_FLAGS)",-
+"SETUP_COMPILER=$(SETUP_COMPILER)"-
 )
 
 ############################################################################
@@ -212,7 +227,7 @@ PHP_MODULES = $(PHP_MODULES) -
 [.$(OUT_DIR)]dlm.exe
 .ENDIF
 
-.IF X86_HOST
+.IF X86_64_CROSS
 .ELSE
 
 .IF NEW_SWIG_INSTALLED
@@ -263,7 +278,7 @@ PHPLIB_DATE_FILES = -
 [.ext.date.lib]tm2unixtime.c -
 [.ext.date.lib]unixtime2tm.c
 
-[.$(OUT_DIR)]phplib_date.olb : [.vms.mms]phplib_date.mms $(PHPLIB_DATE_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_date.olb : [.vms.mms]phplib_date.mms $(PHPLIB_DATE_FILES) $(CC_HEADERS)
 
 ############################################################################
 # phplib_pcre
@@ -301,17 +316,17 @@ PHPLIB_PCRE_FILES = -
 [.ext.pcre.pcre2lib]pcre2_valid_utf.c -
 [.ext.pcre.pcre2lib]pcre2_xclass.c
 
-[.$(OUT_DIR)]phplib_pcre.olb : [.vms.mms]phplib_pcre.mms $(PHPLIB_PCRE_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_pcre.olb : [.vms.mms]phplib_pcre.mms $(PHPLIB_PCRE_FILES) $(CC_HEADERS)
 
 ############################################################################
 # libxml
 ############################################################################
-[.$(OUT_DIR)]phplib_libxml.olb : [.vms.mms]phplib_libxml.mms [.ext.libxml]libxml.c $(HEADERS)
+[.$(OUT_DIR)]phplib_libxml.olb : [.vms.mms]phplib_libxml.mms [.ext.libxml]libxml.c $(CC_HEADERS)
 
 ############################################################################
 # sqlite3
 ############################################################################
-[.$(OUT_DIR)]phplib_sqlite3.olb : [.vms.mms]phplib_sqlite3.mms [.ext.sqlite3]sqlite3.c $(HEADERS)
+[.$(OUT_DIR)]phplib_sqlite3.olb : [.vms.mms]phplib_sqlite3.mms [.ext.sqlite3]sqlite3.c $(CC_HEADERS)
 
 ############################################################################
 # dom
@@ -340,12 +355,12 @@ DOM_FILES = -
 [.ext.dom]text.c -
 [.ext.dom]xpath.c
 
-[.$(OUT_DIR)]phplib_dom.olb : [.vms.mms]phplib_dom.mms $(DOM_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_dom.olb : [.vms.mms]phplib_dom.mms $(DOM_FILES) $(CC_HEADERS)
 
 ############################################################################
 # ctype
 ############################################################################
-[.$(OUT_DIR)]phplib_ctype.olb : [.vms.mms]phplib_ctype.mms [.ext.ctype]ctype.c $(HEADERS)
+[.$(OUT_DIR)]phplib_ctype.olb : [.vms.mms]phplib_ctype.mms [.ext.ctype]ctype.c $(CC_HEADERS)
 
 ############################################################################
 # fileinfo
@@ -372,7 +387,7 @@ FILEINFO_FILES = -
 [.ext.fileinfo.libmagic]softmagic.c -
 [.ext.fileinfo.libmagic]strcasestr.c
 
-[.$(OUT_DIR)]phplib_fileinfo.olb : [.vms.mms]phplib_fileinfo.mms $(FILEINFO_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_fileinfo.olb : [.vms.mms]phplib_fileinfo.mms $(FILEINFO_FILES) $(CC_HEADERS)
 
 ############################################################################
 # filter
@@ -383,7 +398,7 @@ FILTER_FILES = -
 [.ext.filter]logical_filters.c -
 [.ext.filter]callback_filter.c
 
-[.$(OUT_DIR)]phplib_filter.olb : [.vms.mms]phplib_filter.mms $(FILTER_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_filter.olb : [.vms.mms]phplib_filter.mms $(FILTER_FILES) $(CC_HEADERS)
 
 ############################################################################
 # hash
@@ -407,12 +422,12 @@ HASH_FILES = -
 [.ext.hash.sha3.generic32lc]KeccakHash.c -
 [.ext.hash.sha3.generic32lc]KeccakSponge.c
 
-[.$(OUT_DIR)]phplib_hash.olb : [.vms.mms]phplib_hash.mms $(HASH_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_hash.olb : [.vms.mms]phplib_hash.mms $(HASH_FILES) $(CC_HEADERS)
 
 ############################################################################
 # iconv
 ############################################################################
-[.$(OUT_DIR)]phplib_iconv.olb : [.vms.mms]phplib_iconv.mms [.ext.iconv]iconv.c $(HEADERS)
+[.$(OUT_DIR)]phplib_iconv.olb : [.vms.mms]phplib_iconv.mms [.ext.iconv]iconv.c $(CC_HEADERS)
 
 ############################################################################
 # json
@@ -423,7 +438,7 @@ JSON_FILES = -
 [.ext.json]json_parser^.tab.c -
 [.ext.json]json_scanner.c -
 
-[.$(OUT_DIR)]phplib_json.olb : [.vms.mms]phplib_json.mms $(JSON_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_json.olb : [.vms.mms]phplib_json.mms $(JSON_FILES) $(CC_HEADERS)
 
 ############################################################################
 # pdo
@@ -435,7 +450,7 @@ PDO_FILES = -
 [.ext.pdo]pdo_sql_parser.c -
 [.ext.pdo]pdo_sqlstate.c
 
-[.$(OUT_DIR)]phplib_pdo.olb : [.vms.mms]phplib_pdo.mms $(PDO_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_pdo.olb : [.vms.mms]phplib_pdo.mms $(PDO_FILES) $(CC_HEADERS)
 
 ############################################################################
 # pdo sqlite
@@ -445,7 +460,7 @@ PDOLITE_FILES = -
 [.ext.pdo_sqlite]sqlite_driver.c -
 [.ext.pdo_sqlite]sqlite_statement.c
 
-[.$(OUT_DIR)]phplib_pdolite.olb : [.vms.mms]phplib_pdolite.mms $(PDOLITE_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_pdolite.olb : [.vms.mms]phplib_pdolite.mms $(PDOLITE_FILES) $(CC_HEADERS)
 
 ############################################################################
 # phar
@@ -461,17 +476,17 @@ PHAR_FILES = -
 [.ext.phar]util.c -
 [.ext.phar]zip.c
 
-[.$(OUT_DIR)]phplib_phar.olb : [.vms.mms]phplib_phar.mms $(PHAR_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_phar.olb : [.vms.mms]phplib_phar.mms $(PHAR_FILES) $(CC_HEADERS)
 
 ############################################################################
 # posix
 ############################################################################
-[.$(OUT_DIR)]phplib_posix.olb : [.vms.mms]phplib_posix.mms [.ext.posix]posix.c $(HEADERS)
+[.$(OUT_DIR)]phplib_posix.olb : [.vms.mms]phplib_posix.mms [.ext.posix]posix.c $(CC_HEADERS)
 
 ############################################################################
 # reflection
 ############################################################################
-[.$(OUT_DIR)]phplib_reflection.olb : [.vms.mms]phplib_reflection.mms [.ext.reflection]php_reflection.c $(HEADERS)
+[.$(OUT_DIR)]phplib_reflection.olb : [.vms.mms]phplib_reflection.mms [.ext.reflection]php_reflection.c $(CC_HEADERS)
 
 ############################################################################
 # session
@@ -483,12 +498,12 @@ SESSION_FILES = -
 [.ext.session]mod_user_class.c -
 [.ext.session]session.c
 
-[.$(OUT_DIR)]phplib_session.olb : [.vms.mms]phplib_session.mms $(SESSION_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_session.olb : [.vms.mms]phplib_session.mms $(SESSION_FILES) $(CC_HEADERS)
 
 ############################################################################
 # simplexml
 ############################################################################
-[.$(OUT_DIR)]phplib_simplexml.olb : [.vms.mms]phplib_simplexml.mms [.ext.simplexml]simplexml.c $(HEADERS)
+[.$(OUT_DIR)]phplib_simplexml.olb : [.vms.mms]phplib_simplexml.mms [.ext.simplexml]simplexml.c $(CC_HEADERS)
 
 ############################################################################
 # spl
@@ -506,7 +521,7 @@ SPL_FILES = -
 [.ext.spl]spl_iterators.c -
 [.ext.spl]spl_observer.c
 
-[.$(OUT_DIR)]phplib_spl.olb : [.vms.mms]phplib_spl.mms $(SPL_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_spl.olb : [.vms.mms]phplib_spl.mms $(SPL_FILES) $(CC_HEADERS)
 
 ############################################################################
 # standard
@@ -584,7 +599,7 @@ STANDARD_FILES = -
 [.ext.standard]var_unserializer.c -
 [.ext.standard]versioning.c
 
-[.$(OUT_DIR)]phplib_standard.olb : [.vms.mms]phplib_standard.mms $(STANDARD_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_standard.olb : [.vms.mms]phplib_standard.mms $(STANDARD_FILES) $(CC_HEADERS)
 
 ############################################################################
 # tokenizer
@@ -593,7 +608,7 @@ TOKENIZER_FILES = -
 [.ext.tokenizer]tokenizer.c -
 [.ext.tokenizer]tokenizer_data.c
 
-[.$(OUT_DIR)]phplib_tokenizer.olb : [.vms.mms]phplib_tokenizer.mms $(TOKENIZER_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_tokenizer.olb : [.vms.mms]phplib_tokenizer.mms $(TOKENIZER_FILES) $(CC_HEADERS)
 
 ############################################################################
 # xml
@@ -604,12 +619,12 @@ XML_FILES = -
 [.ext.xmlreader]php_xmlreader.c -
 [.ext.xmlwriter]php_xmlwriter.c
 
-[.$(OUT_DIR)]phplib_xml.olb : [.vms.mms]phplib_xml.mms $(XML_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_xml.olb : [.vms.mms]phplib_xml.mms $(XML_FILES) $(CC_HEADERS)
 
 ############################################################################
 # tsrm
 ############################################################################
-[.$(OUT_DIR)]phplib_tsrm.olb : [.vms.mms]phplib_tsrm.mms [.tsrm]tsrm.c $(HEADERS)
+[.$(OUT_DIR)]phplib_tsrm.olb : [.vms.mms]phplib_tsrm.mms [.tsrm]tsrm.c $(CC_HEADERS)
 
 ############################################################################
 # main
@@ -640,7 +655,7 @@ MAIN_FILES = -
 [.main]strlcpy.c -
 [.vms]syslog.c -
 
-[.$(OUT_DIR)]phplib_main.olb : [.vms.mms]phplib_main.mms $(MAIN_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_main.olb : [.vms.mms]phplib_main.mms $(MAIN_FILES) $(CC_HEADERS)
 
 ############################################################################
 # streams
@@ -657,7 +672,7 @@ STREAMS_FILES = -
 [.main.streams]userspace.c -
 [.main.streams]xp_socket.c
 
-[.$(OUT_DIR)]phplib_streams.olb : [.vms.mms]phplib_streams.mms $(STREAMS_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_streams.olb : [.vms.mms]phplib_streams.mms $(STREAMS_FILES) $(CC_HEADERS)
 
 ############################################################################
 # zend
@@ -717,7 +732,7 @@ ZEND_FILES = -
 [.Zend]zend_vm_opcodes.c -
 [.Zend]zend_weakrefs.c -
 
-[.$(OUT_DIR)]phplib_zend.olb : [.vms.mms]phplib_zend.mms $(ZEND_FILES) $(HEADERS)
+[.$(OUT_DIR)]phplib_zend.olb : [.vms.mms]phplib_zend.mms $(ZEND_FILES) $(CC_HEADERS)
 
 ############################################################################
 # php$shr
@@ -735,7 +750,7 @@ PHP_CLI_FILES = -
 [.sapi.cli]ps_title.c -
 [.vms]vms_crtl_init.c
 
-[.$(OUT_DIR)]php.exe : [.vms.mms]php.mms $(PHP_CLI_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]php.exe : [.vms.mms]php.mms $(PHP_CLI_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # php-cgi
@@ -745,7 +760,7 @@ PHP_CGI_FILES = -
 [.main]fastcgi.c -
 [.vms]vms_crtl_init.c
 
-[.$(OUT_DIR)]php-cgi.exe : [.vms.mms]php-cgi.mms $(PHP_CGI_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]php-cgi.exe : [.vms.mms]php-cgi.mms $(PHP_CGI_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # curl
@@ -756,7 +771,7 @@ CURL_FILES = -
 [.ext.curl]multi.c -
 [.ext.curl]share.c
 
-[.$(OUT_DIR)]curl.exe : [.vms.mms]curl.mms $(CURL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]curl.exe : [.vms.mms]curl.mms $(CURL_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # gmp
@@ -764,7 +779,7 @@ CURL_FILES = -
 GMP_FILES = -
 [.ext.gmp]gmp.c
 
-[.$(OUT_DIR)]gmp.exe : [.vms.mms]gmp.mms $(GMP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]gmp.exe : [.vms.mms]gmp.mms $(GMP_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # gmp
@@ -774,7 +789,7 @@ ZLIB_FILES = -
 [.ext.zlib]zlib_filter.c -
 [.ext.zlib]zlib_fopen_wrapper.c
 
-[.$(OUT_DIR)]zlib.exe : [.vms.mms]zlib.mms $(ZLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]zlib.exe : [.vms.mms]zlib.mms $(ZLIB_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # sockets
@@ -786,7 +801,7 @@ SOCKETS_FILES = -
 [.ext.sockets]sockaddr_conv.c -
 [.ext.sockets]sockets.c
 
-[.$(OUT_DIR)]sockets.exe : [.vms.mms]sockets.mms $(SOCKETS_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]sockets.exe : [.vms.mms]sockets.mms $(SOCKETS_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # ftp
@@ -795,7 +810,7 @@ FTP_FILES = -
 [.ext.ftp]ftp.c -
 [.ext.ftp]php_ftp.c
 
-[.$(OUT_DIR)]ftp.exe : [.vms.mms]ftp.mms $(FTP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]ftp.exe : [.vms.mms]ftp.mms $(FTP_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # openssl
@@ -804,7 +819,7 @@ OPENSSL_FILES = -
 [.ext.openssl]openssl.c -
 [.ext.openssl]xp_ssl.c
 
-[.$(OUT_DIR)]openssl.exe : [.vms.mms]openssl.mms $(OPENSSL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]openssl.exe : [.vms.mms]openssl.mms $(OPENSSL_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # exif
@@ -812,7 +827,7 @@ OPENSSL_FILES = -
 EXIF_FILES = -
 [.ext.exif]exif.c
 
-[.$(OUT_DIR)]exif.exe : [.vms.mms]exif.mms $(EXIF_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]exif.exe : [.vms.mms]exif.mms $(EXIF_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # calendar
@@ -827,7 +842,7 @@ CALENDAR_FILES = -
 [.ext.calendar]jewish.c -
 [.ext.calendar]julian.c -
 
-[.$(OUT_DIR)]calendar.exe : [.vms.mms]calendar.mms $(CALENDAR_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]calendar.exe : [.vms.mms]calendar.mms $(CALENDAR_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # ldap
@@ -835,7 +850,7 @@ CALENDAR_FILES = -
 LDAP_FILES = -
 [.ext.ldap]ldap.c
 
-[.$(OUT_DIR)]ldap.exe : [.vms.mms]ldap.mms $(LDAP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]ldap.exe : [.vms.mms]ldap.mms $(LDAP_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # soap
@@ -849,7 +864,7 @@ SOAP_FILES = -
 [.ext.soap]php_xml.c -
 [.ext.soap]soap.c -
 
-[.$(OUT_DIR)]soap.exe : [.vms.mms]soap.mms $(SOAP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]soap.exe : [.vms.mms]soap.mms $(SOAP_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # bcmath
@@ -878,7 +893,7 @@ BCMATH_FILES = -
 [.ext.bcmath.libbcmath.src]sub.c -
 [.ext.bcmath.libbcmath.src]zero.c
 
-[.$(OUT_DIR)]bcmath.exe : [.vms.mms]bcmath.mms $(BCMATH_FILES) $(HEADERS)
+[.$(OUT_DIR)]bcmath.exe : [.vms.mms]bcmath.mms $(BCMATH_FILES) $(CC_HEADERS)
 
 ############################################################################
 # openvms
@@ -887,7 +902,7 @@ OPENVMS_FILES = -
 [.ext.openvms]openvms.c -
 [.ext.openvms]cvtfnm.c -
 
-[.$(OUT_DIR)]openvms.exe : [.vms.mms]openvms.mms $(OPENVMS_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]openvms.exe : [.vms.mms]openvms.mms $(OPENVMS_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # bz2
@@ -896,7 +911,7 @@ BZ2_FILES = -
 [.ext.bz2]bz2.c -
 [.ext.bz2]bz2_filter.c -
 
-[.$(OUT_DIR)]bz2.exe : [.vms.mms]bz2.mms $(BZ2_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]bz2.exe : [.vms.mms]bz2.mms $(BZ2_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # odbc
@@ -905,7 +920,7 @@ ODBC_FILES = -
 [.vms]odbc.c -
 [.ext.odbc]php_odbc.c -
 
-[.$(OUT_DIR)]odbc.exe : [.vms.mms]odbc.mms $(ODBC_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]odbc.exe : [.vms.mms]odbc.mms $(ODBC_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ! ############################################################################
 ! # wddx
@@ -913,7 +928,7 @@ ODBC_FILES = -
 ! WDDX_FILES = -
 ! [.ext.wddx]wddx.c -
 
-! [.$(OUT_DIR)]wddx.exe : [.vms.mms]wddx.mms $(WDDX_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+! [.$(OUT_DIR)]wddx.exe : [.vms.mms]wddx.mms $(WDDX_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # xsl
@@ -922,7 +937,7 @@ XSL_FILES = -
 [.ext.xsl]php_xsl.c -
 [.ext.xsl]xsltprocessor.c -
 
-[.$(OUT_DIR)]xsl.exe : [.vms.mms]xsl.mms $(XSL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]xsl.exe : [.vms.mms]xsl.mms $(XSL_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # opcache
@@ -964,7 +979,7 @@ OPCACHE_FILES = -
 [.ext.opcache.Optimizer]zend_optimizer.c -
 [.ext.opcache.Optimizer]zend_ssa.c -
 
-[.$(OUT_DIR)]opcache.exe : [.vms.mms]opcache.mms $(OPCACHE_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]opcache.exe : [.vms.mms]opcache.mms $(OPCACHE_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # sysvsem
@@ -972,7 +987,7 @@ OPCACHE_FILES = -
 SYSVSEM_FILES = -
 [.ext.sysvsem]sysvsem.c -
 
-[.$(OUT_DIR)]sysvsem.exe : [.vms.mms]sysvsem.mms $(SYSVSEM_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]sysvsem.exe : [.vms.mms]sysvsem.mms $(SYSVSEM_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # libmbfl
@@ -1078,7 +1093,7 @@ MBSTRING_FILES = -
 
 [.$(OUT_DIR)]mbstring.exe : [.vms.mms]mbstring.mms -
 $(MBSTRING_FILES) -
-$(HEADERS) -
+$(CC_HEADERS) -
 [.$(OUT_DIR)]php$shr.exe -
 [.$(OUT_DIR)]libmbfl.olb
 
@@ -1091,7 +1106,7 @@ GD_FILES = -
 
 [.$(OUT_DIR)]gd.exe : [.vms.mms]gd.mms -
 $(GD_FILES) -
-$(HEADERS) -
+$(CC_HEADERS) -
 [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
@@ -1123,7 +1138,7 @@ MYSQLND_FILES = -
 
 [.$(OUT_DIR)]mysqlnd.exe : [.vms.mms]mysqlnd.mms -
 $(MYSQLND_FILES) -
-$(HEADERS) -
+$(CC_HEADERS) -
 [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
@@ -1132,7 +1147,7 @@ $(HEADERS) -
 SYSVSHM_FILES = -
 [.ext.sysvshm]sysvshm.c -
 
-[.$(OUT_DIR)]sysvshm.exe : [.vms.mms]sysvshm.mms $(SYSVSHM_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]sysvshm.exe : [.vms.mms]sysvshm.mms $(SYSVSHM_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # tidy
@@ -1140,7 +1155,7 @@ SYSVSHM_FILES = -
 TIDY_FILES = -
 [.ext.tidy]tidy.c -
 
-[.$(OUT_DIR)]tidy.exe : [.vms.mms]tidy.mms $(TIDY_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]tidy.exe : [.vms.mms]tidy.mms $(TIDY_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # mysqli
@@ -1156,7 +1171,7 @@ MYSQLI_FILES = -
 [.ext.mysqli]mysqli_warning.c -
 [.ext.mysqli]mysqli.c -
 
-[.$(OUT_DIR)]mysqli.exe : [.vms.mms]mysqli.mms $(MYSQLI_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]mysqli.exe : [.vms.mms]mysqli.mms $(MYSQLI_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # pdo_mysql
@@ -1166,7 +1181,7 @@ PDO_MYSQL_FILES = -
 [.ext.pdo_mysql]mysql_statement.c -
 [.ext.pdo_mysql]pdo_mysql.c -
 
-[.$(OUT_DIR)]pdo_mysql.exe : [.vms.mms]pdo_mysql.mms $(PDO_MYSQL_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]pdo_mysql.exe : [.vms.mms]pdo_mysql.mms $(PDO_MYSQL_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # shmop
@@ -1174,7 +1189,7 @@ PDO_MYSQL_FILES = -
 SHMOP_FILES = -
 [.ext.shmop]shmop.c -
 
-[.$(OUT_DIR)]shmop.exe : [.vms.mms]shmop.mms $(SHMOP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]shmop.exe : [.vms.mms]shmop.mms $(SHMOP_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # readline
@@ -1183,7 +1198,7 @@ READLINE_FILES = -
 [.ext.readline]readline.c -
 [.ext.readline]readline_cli.c -
 
-[.$(OUT_DIR)]readline.exe : [.vms.mms]readline.mms $(READLINE_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]readline.exe : [.vms.mms]readline.mms $(READLINE_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # zip
@@ -1192,7 +1207,7 @@ ZIP_FILES = -
 [.ext.zip]php_zip.c -
 [.ext.zip]zip_stream.c -
 
-[.$(OUT_DIR)]zip.exe : [.vms.mms]zip.mms $(ZIP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]zip.exe : [.vms.mms]zip.mms $(ZIP_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # mod_php
@@ -1203,7 +1218,7 @@ MOD_PHP_FILES = -
 [.sapi.apache2handler]php_functions.c -
 [.sapi.apache2handler]sapi_apache2.c -
 
-[.$(OUT_DIR)]mod_php.exe : [.vms.mms]mod_php.mms $(MOD_PHP_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]mod_php.exe : [.vms.mms]mod_php.mms $(MOD_PHP_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # dba
@@ -1229,7 +1244,7 @@ DBA_FILES = -
 [.ext.dba.libflatfile]flatfile.c -
 [.ext.dba.libinifile]inifile.c -
 
-[.$(OUT_DIR)]dba.exe : [.vms.mms]dba.mms $(DBA_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]dba.exe : [.vms.mms]dba.mms $(DBA_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # pdo_dblib_freetds
@@ -1239,7 +1254,7 @@ PDO_DBLIB_FILES = -
 [.ext.pdo_dblib]dblib_stmt.c -
 [.ext.pdo_dblib]pdo_dblib.c -
 
-[.$(OUT_DIR)]pdo_dblib_freetds.exe : [.vms.mms]pdo_dblib_freetds.mms $(PDO_DBLIB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]pdo_dblib_freetds.exe : [.vms.mms]pdo_dblib_freetds.mms $(PDO_DBLIB_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # rdb
@@ -1249,7 +1264,7 @@ RDB_FILES = -
 [.ext.rdb]db.c -
 [.ext.rdb]sql.sqlmod -
 
-[.$(OUT_DIR)]rdb.exe : [.vms.mms]rdb.mms $(RDB_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]rdb.exe : [.vms.mms]rdb.mms $(RDB_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # dlm
@@ -1258,7 +1273,7 @@ DLM_FILES = -
 [.ext.dlm]dlm.i -
 [.ext.dlm]dlm.c -
 
-[.$(OUT_DIR)]dlm.exe : [.vms.mms]dlm.mms $(DLM_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]dlm.exe : [.vms.mms]dlm.mms $(DLM_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 # rec
@@ -1267,7 +1282,7 @@ REC_FILES = -
 [.ext.dtr]rec.i -
 [.ext.dtr]rec.c -
 
-[.$(OUT_DIR)]rec.exe : [.vms.mms]rec.mms $(REC_FILES) $(HEADERS) [.$(OUT_DIR)]php$shr.exe
+[.$(OUT_DIR)]rec.exe : [.vms.mms]rec.mms $(REC_FILES) $(CC_HEADERS) [.$(OUT_DIR)]php$shr.exe
 
 ############################################################################
 CLEAN :

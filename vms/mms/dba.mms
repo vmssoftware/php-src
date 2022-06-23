@@ -3,7 +3,7 @@
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)-
-/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN))) -
 /DEFINE=($(CC_DEFINES)-
 ,GDBM_INCLUDE_FILE=<gdbm.h>-
 )-
@@ -11,23 +11,8 @@ CC_FLAGS = $(CC_QUALIFIERS)-
 ,oss$root:[include]-
 )
 
-############################################################################
-# First
-############################################################################
-.IF X86_HOST
-X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
-X86_LIBDEF = define/nolog sys$library X86$LIBRARY
-X86_OSSDEF = define/nolog/trans=concealed oss$root DSA22:[OSS.X86.]
-.ELSE
-X86_START =
-X86_LIBDEF =
-X86_OSSDEF = 
-.ENDIF
-
 .FIRST
-    $(X86_START)
-    $(X86_LIBDEF)
-    $(X86_OSSDEF)
+    $(SETUP_COMPILER)
     @ ! defines for nested includes
     @ define libcdb [.ext.dba.libcdb]
     @ define libflatfile [.ext.dba.libflatfile]

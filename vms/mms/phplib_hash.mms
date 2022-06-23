@@ -3,24 +3,12 @@
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)-
-/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN))) -
 /DEFINE=($(CC_DEFINES),"KeccakP200_excluded","KeccakP400_excluded","KeccakP800_excluded")-
 /INCLUDE_DIRECTORY=($(CC_INCLUDES),[.ext.hash.xxhash],[.ext.hash.sha3.generic32lc])
 
-############################################################################
-# First
-############################################################################
-.IF X86_HOST
-X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
-X86_LIBDEF = define/nolog sys$library X86$LIBRARY
-.ELSE
-X86_START =
-X86_LIBDEF =
-.ENDIF
-
 .FIRST
-    $(X86_START)
-    $(X86_LIBDEF)
+    $(SETUP_COMPILER)
     @ define murmur [.ext.hash.murmur]
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).ext.hash] | copy SYS$INPUT nl:

@@ -1,8 +1,8 @@
 php$build_obj:[ext.ftp]ftp.obj
 php$build_obj:[ext.ftp]php_ftp.obj
 php$build_out:[000000]php$shr.exe/share
-SSL1$ROOT:[LIB]SSL1$LIBSSL32.OLB/lib
-SSL1$ROOT:[LIB]SSL1$LIBCRYPTO32.OLB/lib
+SSL111_LIBSSL32/lib
+SSL111_LIBCRYPTO32/lib
 GSMATCH=LEQUAL,1,0
 CASE_SENSITIVE=YES
 SYMBOL_VECTOR=(get_module=PROCEDURE)

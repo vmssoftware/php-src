@@ -3,29 +3,14 @@
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)-
-/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN))) -
 /DEFINE=($(CC_DEFINES))-
 /INCLUDE_DIRECTORY=($(CC_INCLUDES))
 
-############################################################################
-# First
-############################################################################
-.IF X86_HOST
-X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
-X86_LIBDEF = define/nolog sys$library X86$LIBRARY
-X86_OSSDEF = define/nolog/trans=concealed oss$root DSA22:[OSS.X86.]
-.ELSE
-X86_START =
-X86_LIBDEF =
-X86_OSSDEF = 
-.ENDIF
-
 .FIRST
-    $(X86_START)
-    $(X86_LIBDEF)
-    $(X86_OSSDEF)
+    $(SETUP_COMPILER)
     @ ! defines for nested includes
-    @ define curl DSA22:[OSS.IA64.include.curl]
+    @ define curl oss$root:[include.curl]
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).ext.curl] | copy SYS$INPUT nl:
 
@@ -48,7 +33,7 @@ OBJ_FILES = -
 # Main target rule
 ############################################################################
 [.$(OUT_DIR)]curl.exe : $(OBJ_FILES)
-.IF X86_HOST
+.IF X86_64_CROSS
     $(LINK) $(LINK_FLAGS) /SHARE=$(MMS$TARGET) [.vms.opt]curl_x86.opt/opt
 .ELSE
     $(LINK) $(LINK_FLAGS) /SHARE=$(MMS$TARGET) [.vms.opt]curl.opt/opt

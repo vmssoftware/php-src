@@ -3,42 +3,18 @@
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)-
-/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN))) -
 /DEFINE=($(CC_DEFINES))-
 /INCLUDE_DIRECTORY=($(CC_INCLUDES)-
 ,[.sapi.apache2handler]-
 )
 
-############################################################################
-# First
-############################################################################
-.IF X86_HOST
-X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
-X86_LIBDEF = define/nolog sys$library X86$LIBRARY
-X86_OSSDEF = define/nolog/trans=concealed oss$root DSA22:[OSS.X86.]
-APACHE$APR_SHR = define/nolog APACHE$APR_SHR oss$root:[lib]apache$apr_shr.exe
-APACHE$APU_SHR = define/nolog APACHE$APU_SHR oss$root:[lib]apache$apu_shr.exe
-APACHE$HTTPD_SHR = define/nolog APACHE$HTTPD_SHR oss$root:[lib]apache$httpd_shr.exe
-.ELSE
-X86_START =
-X86_LIBDEF =
-X86_OSSDEF = 
-APACHE$APR_SHR =
-APACHE$APU_SHR =
-APACHE$HTTPD_SHR =
-.ENDIF
-
 .FIRST
-    $(X86_START)
-    $(X86_LIBDEF)
-    $(X86_OSSDEF)
+    $(SETUP_COMPILER)
     @ ! defines for nested includes
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).sapi.apache2handler] | copy SYS$INPUT nl:
     !
-    @ $(APACHE$APR_SHR)
-    @ $(APACHE$APU_SHR)
-    @ $(APACHE$HTTPD_SHR)
 
 ############################################################################
 # Main target

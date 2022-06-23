@@ -3,33 +3,15 @@
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS)-
-/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN))) -
 /DEFINE=($(CC_DEFINES))-
 /INCLUDE_DIRECTORY=($(CC_INCLUDES))
 
-############################################################################
-# First
-############################################################################
-.IF X86_HOST
-X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
-X86_LIBDEF = define/nolog sys$library X86$LIBRARY
-X86_OSSDEF = define/nolog/trans=concealed oss$root DSA22:[OSS.X86.]
-TCPIP_LIB = usr_disk:[vorfolomeev.tcpip_x86]tcpip$lib.olb
-.ELSE
-X86_START =
-X86_LIBDEF =
-X86_OSSDEF = 
-TCPIP_LIB = sys$common:[tcpip$lib]tcpip$lib.olb
-.ENDIF
-
 .FIRST
-    $(X86_START)
-    $(X86_LIBDEF)
-    $(X86_OSSDEF)
+    $(SETUP_COMPILER)
     @ ! defines for nested includes
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR)] | copy SYS$INPUT nl:
-    @ define TCPIP_LIB $(TCPIP_LIB)
 
 ############################################################################
 # Main target

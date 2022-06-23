@@ -3,24 +3,13 @@
 ############################################################################
 
 CC_FLAGS = $(CC_QUALIFIERS) -
-/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN_G))) -
+/WARNINGS=(WARNINGS=ALL, DISABLE=($(CC_DISABLE_WARN))) -
 /DEFINE=($(CC_DEFINES)) -
 /INCLUDE_DIRECTORY=($(CC_INCLUDES),[.ext.bcmath.libbcmath.src])
 
-############################################################################
-# First
-############################################################################
-.IF X86_HOST
-X86_START = @SYS$MANAGER:X86_XTOOLS$SYLOGIN
-X86_LIBDEF = define/nolog sys$library X86$LIBRARY
-.ELSE
-X86_START =
-X86_LIBDEF =
-.ENDIF
 
 .FIRST
-    $(X86_START)
-    $(X86_LIBDEF)
+    $(SETUP_COMPILER)
     @ ! defines for nested includes
     @ define libbcmath [.ext.bcmath.libbcmath]
     @ ! create output directory (because of bug in MMS)

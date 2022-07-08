@@ -2,7 +2,7 @@ php$build_obj:[ext.curl]curl_file.obj
 php$build_obj:[ext.curl]interface.obj
 php$build_obj:[ext.curl]multi.obj
 php$build_obj:[ext.curl]share.obj
-php$build_obj:[vms]vms_crtl_init.obj
+! php$build_obj:[vms]vms_crtl_init.obj
 php$build_out:[000000]php$shr.exe/share
 oss$root:[lib]libcurl.olb/lib
 ! libcurl requires SSL1

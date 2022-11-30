@@ -1084,9 +1084,19 @@ static char *GetIdent (unsigned int);
 extern int decc$$translate ();
 extern EXE$GL_ABSTIM;
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_openvms_cvt_filename, 0, 2, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, func_code, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, file_name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_openvms_getdvi, 0, 1, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, item_code, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, device_name, IS_STRING, 1, "TT")
+ZEND_END_ARG_INFO()
+
 const zend_function_entry openvms_functions[] = {
- PHP_FE(openvms_cvt_filename, NULL)
- PHP_FE(openvms_getdvi, NULL)
+ PHP_FE(openvms_cvt_filename, arginfo_cvt_filename)
+ PHP_FE(openvms_getdvi, arginfo_openvms_getdvi)
  PHP_FE(openvms_getjpi, NULL)
  PHP_FE(openvms_getsyi, NULL)
  PHP_FE(openvms_message, NULL)

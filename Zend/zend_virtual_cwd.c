@@ -1748,34 +1748,101 @@ CWD_API char *tsrm_realpath(const char *path, char *real_path) /* {{{ */
 /* }}} */
 
 #ifdef __VMS
+
+#define __NEW_STARLET 1
+#include <unixlib.h>
+
+static int cb_from_vms(__char_ptr32 name, __void_ptr32 user_data)
+{
+	if (name && user_data) {
+		char **ret = (char**)user_data;
+		if (ret) {
+			*ret = strdup(name);
+		}
+	}
+    return 0;
+}
+
+int test_vms_file_name(const char *path) {
+	const char *t = path;
+	int has_colon = FALSE;
+	while (*t) {
+		switch(*t) {
+			case ':':
+				has_colon = TRUE;
+				break;
+			case '[':
+			case ']':
+			case '^':
+			case ';':
+			case '$':
+				return TRUE;
+			case '\\':
+			case '/':
+				return FALSE;
+		}
+		++t;
+	}
+	if (has_colon) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+#define TEST_VMS_PATH(path) 																	\
+	char *t_##path = (char *)path;																\
+	if (test_vms_file_name(path)) {																\
+		char *unix_path = NULL;																	\
+		int num_files = decc$from_vms(path, (__from_vms_callback)cb_from_vms, 0, &unix_path);	\
+		if (num_files) {																		\
+			t_##path = alloca(strlen(unix_path) + 1);											\
+			strcpy(t_##path, unix_path);														\
+		}																						\
+		if (unix_path) {																		\
+			free(unix_path);																	\
+		}																						\
+	}
+
+
 FILE* fopen_vms(const char *path, const char *mode) {
-	return fopen(path, mode);
+	TEST_VMS_PATH(path)
+	return fopen(t_path, mode);
 }
 int open_vms(const char *path, int flags) {
-	return open(path, flags);
+	TEST_VMS_PATH(path)
+	return open(t_path, flags);
 }
 int open_mode_vms(const char *path, int flags, int mode) {
-	return open(path, flags, mode);
+	TEST_VMS_PATH(path)
+	return open(t_path, flags, mode);
 }
-int rename_vms(const char *old_file_spec, const char *new_file_spec) {
-	return rename(old_file_spec, new_file_spec);
+int rename_vms(const char *old_path, const char *new_path) {
+	TEST_VMS_PATH(old_path)
+	TEST_VMS_PATH(new_path)
+	return rename(t_old_path, t_new_path);
 }
-int mkdir_vms(const char *pathname, mode_t mode) {
-	return mkdir(pathname, mode);
+int mkdir_vms(const char *path, mode_t mode) {
+	TEST_VMS_PATH(path)
+	return mkdir(t_path, mode);
 }
-int rmdir_vms(const char *pathname) {
-	return rmdir(pathname);
+int rmdir_vms(const char *path) {
+	TEST_VMS_PATH(path)
+	return rmdir(t_path);
 }
 int unlink_vms(const char *path) {
-	return unlink(path);
+	TEST_VMS_PATH(path)
+	return unlink(t_path);
 }
 int chdir_vms(const char* path) {
-	return chdir(path);
+	TEST_VMS_PATH(path)
+	return chdir(t_path);
 }
-int access_vms(const char *pathname, int mode) {
-	return access(pathname, mode);
+int access_vms(const char *path, int mode) {
+	TEST_VMS_PATH(path)
+	return access(t_path, mode);
 }
 int chmod_vms(const char *path, int mode) {
-	return chmod(path, mode);
+	TEST_VMS_PATH(path)
+	return chmod(t_path, mode);
 }
 #endif

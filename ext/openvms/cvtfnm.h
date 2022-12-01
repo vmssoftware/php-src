@@ -1,6 +1,6 @@
 /*
 **
-** © Copyright 2002 Hewlett-Packard Development Company, L.P.
+** ï¿½ Copyright 2002 Hewlett-Packard Development Company, L.P.
 **
 ** Hewlett-Packard and the Hewlett-Packard logo are trademarks
 ** of Hewlett-Packard Development Company L.P. in the U.S. and/or
@@ -29,8 +29,8 @@
 /*
 ** Define the convert function types
 */
-#define CVT_FNM_UNIX_TO_VMS	1
-#define CVT_FNM_VMS_TO_UNIX	2
+#define CVT_FNM_VMS_TO_UNIX	1
+#define CVT_FNM_UNIX_TO_VMS	2
 
 /*
 ** Define the convert function prototype

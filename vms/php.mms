@@ -19,6 +19,7 @@ EXTRASEMI-
 ,INTCONSTTRUNC-
 ,TOOFEWACTUALS-
 ,UNDEFESCAP-
+,NOTCONSTQUAL-
 
 ############################################################################
 # Compiler definitions
@@ -82,7 +83,6 @@ LINK_FLAGS =
 .ELSIF X86_64
 SETUP_COMPILER = @[.vms]setup_native_x86_compiler.com
 CC_DEFINES = $(CC_DEFINES),""i386""
-CC_QUALIFIERS=$(CC_QUALIFIERS)/SWITCHES=NOCHECK
 LINK_FLAGS=/SEGMENT=CODE=P0
 .ELSE
 SETUP_COMPILER = @[.vms]setup_compiler.com

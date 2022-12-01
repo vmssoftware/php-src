@@ -1,4 +1,3 @@
 $ define/nolog SSL111_LIBSSL32 SSL111$ROOT:[LIB]SSL111$LIBSSL32.OLB
 $ define/nolog SSL111_LIBCRYPTO32 SSL111$ROOT:[LIB]SSL111$LIBCRYPTO32.OLB
 $ define/nolog TCPIP_LIB sys$common:[tcpip$lib]tcpip$lib.olb
-$ 

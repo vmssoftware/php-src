@@ -10,6 +10,7 @@ CC_FLAGS = $(CC_QUALIFIERS)-
 .FIRST
     $(SETUP_COMPILER)
     @ ! defines for nested includes
+    @ define openssl SSL111$INCLUDE:
     @ ! create output directory (because of bug in MMS)
     @ pipe create/dir [.$(OBJ_DIR).ext.openssl] | copy SYS$INPUT nl:
     !

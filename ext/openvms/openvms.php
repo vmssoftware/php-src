@@ -79,7 +79,8 @@ else
 # csid:					Any cluster system ID or -1 wild card
 #
 $item = "BOOTTIME";
-$val = openvms_getsyi ($item, "", 0);
+$csid = 0;  # we need to allocate variable to pass it by reference
+$val = openvms_getsyi ($item, "", $csid);
 if ($val === FALSE)
     echo "openvms_getsyi (\"$item\") = <b>" . openvms_message (openvms_status ()) . "</b><br>\n";
 else

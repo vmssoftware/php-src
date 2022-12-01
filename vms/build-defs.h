@@ -15,6 +15,7 @@
 */
 
 #define CONFIGURE_COMMAND ""
+#define PHP_ODBC_CFLAGS	""
 #define PHP_ADA_INCLUDE		""
 #define PHP_ADA_LFLAGS		""
 #define PHP_ADA_LIBS		""
@@ -85,3 +86,4 @@
 #define PHP_CONFIG_FILE_PATH    "/php$root/etc"
 #define PHP_CONFIG_FILE_SCAN_DIR    ""
 #define PHP_SHLIB_SUFFIX        "exe"
+#define PHP_SHLIB_EXT_PREFIX    ""

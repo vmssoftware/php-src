@@ -1084,25 +1084,51 @@ static char *GetIdent (unsigned int);
 extern int decc$$translate ();
 extern EXE$GL_ABSTIM;
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_openvms_cvt_filename, 0, 2, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, func_code, IS_LONG, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_cvt_filename, 0, 2, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
+    ZEND_ARG_TYPE_MASK(0, func_code, MAY_BE_LONG|MAY_BE_STRING, NULL)
 	ZEND_ARG_TYPE_INFO(0, file_name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_openvms_getdvi, 0, 1, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, item_code, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, device_name, IS_STRING, 1, "TT")
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_getdvi, 0, 1, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
+	ZEND_ARG_TYPE_MASK(0, item_code, MAY_BE_LONG|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO(0, device_name, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_getjpi, 0, 1, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
+	ZEND_ARG_TYPE_MASK(0, item_code, MAY_BE_LONG|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO(0, proc_name, IS_STRING, 1)
+    ZEND_ARG_TYPE_MASK(1, pid, MAY_BE_LONG|MAY_BE_STRING|MAY_BE_NULL, NULL)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_getsyi, 0, 1,  MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
+	ZEND_ARG_TYPE_MASK(0, item_code, MAY_BE_LONG|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO(0, node_name, IS_STRING, 1)
+	ZEND_ARG_TYPE_MASK(1, csid, MAY_BE_LONG|MAY_BE_STRING|MAY_BE_NULL, NULL)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_time, 0, 0, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
+    ZEND_ARG_TYPE_MASK(0, time, MAY_BE_LONG|MAY_BE_STRING|MAY_BE_NULL, NULL)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_uptime, 0, 0, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_message, 0, 1, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
+    ZEND_ARG_TYPE_MASK(0, status_code, MAY_BE_LONG|MAY_BE_STRING, NULL)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_status, 0, 0, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
 ZEND_END_ARG_INFO()
 
 const zend_function_entry openvms_functions[] = {
- PHP_FE(openvms_cvt_filename, arginfo_cvt_filename)
+ PHP_FE(openvms_cvt_filename, arginfo_openvms_cvt_filename)
  PHP_FE(openvms_getdvi, arginfo_openvms_getdvi)
- PHP_FE(openvms_getjpi, NULL)
- PHP_FE(openvms_getsyi, NULL)
- PHP_FE(openvms_message, NULL)
- PHP_FE(openvms_status, NULL)
- PHP_FE(openvms_time, NULL)
- PHP_FE(openvms_uptime, NULL)
+ PHP_FE(openvms_getjpi, arginfo_openvms_getjpi)
+ PHP_FE(openvms_getsyi, arginfo_openvms_getsyi)
+ PHP_FE(openvms_message, arginfo_openvms_message)
+ PHP_FE(openvms_status, arginfo_openvms_status)
+ PHP_FE(openvms_time, arginfo_openvms_time)
+ PHP_FE(openvms_uptime, arginfo_openvms_uptime)
  PHP_FE_END
 };
 
@@ -1227,7 +1253,7 @@ if (status && CvtFile)
     {
     RetFile = estrdup (CvtFile);
     free (CvtFile);
-    RETURN_STRINGL (RetFile, 0);
+    RETURN_STRING (RetFile);
     }
 else
     {
@@ -1383,6 +1409,7 @@ static char *JpiItemBuf = NULL;
 unsigned int JpiPidVal = 0;
 static int JpiItemMax = 0;
 zval *JpiPidPtr = NULL;
+zval *JpiPidPtrRef = NULL;
 char *JpiItemPtr,
      *JpiProcPtr = NULL;
 int JpiItemIdx = -1,
@@ -1403,8 +1430,13 @@ decc$$translate (SS$_NORMAL);
 ** Parse the given aguments
 */
 if (zend_parse_parameters (ZEND_NUM_ARGS() TSRMLS_CC, "s|sz",
-			   &JpiItemPtr, &JpiItemLen, &JpiProcPtr, &JpiProcLen, &JpiPidPtr) == FAILURE)
+			   &JpiItemPtr, &JpiItemLen, &JpiProcPtr, &JpiProcLen, &JpiPidPtrRef) == FAILURE)
     RETURN_FALSE;
+
+if (JpiPidPtrRef) {
+    ZEND_ASSERT(Z_ISREF_P(JpiPidPtrRef));
+    JpiPidPtr = Z_REFVAL_P(JpiPidPtrRef);
+}
 
 /*
 ** Check to see if the user is asking for the list of supported items
@@ -1545,7 +1577,6 @@ if (! (status & 1))
 */
 if (JpiPidPtr != NULL)
     {
-    zval_dtor (JpiPidPtr);
     ZVAL_LONG (JpiPidPtr, JpiPidVal);
     }
 
@@ -1569,6 +1600,7 @@ static char *SyiItemBuf = NULL;
 unsigned int SyiCsidVal = 0;
 static int SyiItemMax = 0;
 zval *SyiCsidPtr = NULL;
+zval *SyiCsidPtrRef = NULL;
 char *SyiItemPtr,
      *SyiNodePtr = NULL;
 int SyiItemIdx = -1,
@@ -1589,8 +1621,13 @@ decc$$translate (SS$_NORMAL);
 ** Parse the given aguments
 */
 if (zend_parse_parameters (ZEND_NUM_ARGS() TSRMLS_CC, "s|sz",
-			   &SyiItemPtr, &SyiItemLen, &SyiNodePtr, &SyiNodeLen, &SyiCsidPtr) == FAILURE)
+			   &SyiItemPtr, &SyiItemLen, &SyiNodePtr, &SyiNodeLen, &SyiCsidPtrRef) == FAILURE)
     RETURN_FALSE;
+
+if (SyiCsidPtrRef) {
+    ZEND_ASSERT(Z_ISREF_P(SyiCsidPtrRef));
+    SyiCsidPtr = Z_REFVAL_P(SyiCsidPtrRef);
+}
 
 /*
 ** Check to see if the user is asking for the list of supported items
@@ -1778,9 +1815,8 @@ if (! (status & 1))
 */
 if (SyiCsidPtr != NULL)
     {
-    zval_dtor (SyiCsidPtr);
     ZVAL_LONG (SyiCsidPtr, SyiCsidVal);
-    }
+}
 
 /*
 ** Format the return value
@@ -1858,7 +1894,7 @@ if (! (status & 1))
 else
     {
     MsgDesc.dsc$a_pointer[MsgDesc.dsc$w_length] = '\0';
-    RETURN_STRINGL (MsgDesc.dsc$a_pointer, 1);
+    RETURN_STRINGL (MsgDesc.dsc$a_pointer, MsgDesc.dsc$w_length);
     }
 
 }
@@ -1962,7 +1998,7 @@ if (DateTimePtr)
 /*
 ** Return the date/time string
 */
-RETURN_STRINGL (DateTimeBuf, 1);
+RETURN_STRING (DateTimeBuf);
 
 }
 
@@ -2028,7 +2064,7 @@ if (DateTimePtr)
 /*
 ** Return the date/time string
 */
-RETURN_STRINGL (DateTimeBuf, 1);
+RETURN_STRING (DateTimeBuf);
 
 }
 
@@ -2054,7 +2090,7 @@ if (ItemPtr->item_type == BOOL)
     else
 	BoolStr = "FALSE";
 
-    RETURN_STRINGL (BoolStr, 1);
+    RETURN_STRING (BoolStr);
     }
 
 /*
@@ -2098,7 +2134,7 @@ if (ItemPtr->item_type == BYTE)
 	/*
 	** Return the CPUCAP_MASK string
 	*/
-        RETURN_STRINGL (CpuCapMaskPtr, 0);
+        RETURN_STRING (CpuCapMaskPtr);
 	}
 
     /*
@@ -2136,7 +2172,7 @@ if (ItemPtr->item_type == BYTE)
 	/*
 	** Return the CPU_AUTOSTART string
 	*/
-        RETURN_STRINGL (CpuAutostartPtr, 0);
+        RETURN_STRING (CpuAutostartPtr);
 	}
 
     /*
@@ -2174,7 +2210,7 @@ if (ItemPtr->item_type == BYTE)
 	/*
 	** Return the CPU_FAILOVER string
 	*/
-        RETURN_STRINGL (CpuFailoverPtr, 0);
+        RETURN_STRING (CpuFailoverPtr);
 	}
 
     /*
@@ -2214,7 +2250,7 @@ if (ItemPtr->item_type == BYTE)
 	/*
 	** Return the RAD item string
 	*/
-	RETURN_STRINGL (RadPtr, 0);
+	RETURN_STRING (RadPtr);
 	}
 
     /*
@@ -2232,7 +2268,7 @@ if (ItemPtr->item_type == BYTE)
     /*
     ** Return the byte value as a hex string
     */
-    RETURN_STRINGL (BytePtr, 0);
+    RETURN_STRING (BytePtr);
     }
 
 /*
@@ -2255,8 +2291,8 @@ if (ItemPtr->item_type == LONG)
 	{
 	for (i = 0; strlen (dvi_acptypes[i].item_name); i++)
 	    if (LongVal == dvi_acptypes[i].item_code)
-		RETURN_STRINGL (dvi_acptypes[i].item_name, 1);
-	RETURN_STRINGL ("ILLEGAL", 1);
+		RETURN_STRING (dvi_acptypes[i].item_name);
+	RETURN_STRING ("ILLEGAL");
 	}
 
     /*
@@ -2266,7 +2302,7 @@ if (ItemPtr->item_type == LONG)
 	{
 	for (i = 0; strlen (jpi_modes[i].item_name); i++)
 	    if (LongVal == jpi_modes[i].item_code)
-		RETURN_STRINGL (jpi_modes[i].item_name, 1);
+		RETURN_STRING (jpi_modes[i].item_name);
 	RETURN_NULL ();
 	}
 
@@ -2278,7 +2314,7 @@ if (ItemPtr->item_type == LONG)
 	{
 	for (i = 0; strlen (jpi_parse[i].item_name); i++)
 	    if (LongVal == jpi_parse[i].item_code)
-		RETURN_STRINGL (jpi_parse[i].item_name, 1);
+		RETURN_STRING (jpi_parse[i].item_name);
 	RETURN_NULL ();
 	}
 
@@ -2289,7 +2325,7 @@ if (ItemPtr->item_type == LONG)
 	{
 	for (i = 0; strlen (jpi_states[i].item_name); i++)
 	    if (LongVal == jpi_states[i].item_code)
-		RETURN_STRINGL (jpi_states[i].item_name, 1);
+		RETURN_STRING (jpi_states[i].item_name);
 	RETURN_NULL ();
 	}
 
@@ -2312,7 +2348,7 @@ if (ItemPtr->item_type == TEXT)
     /*
     ** Return the text data
     */
-    RETURN_STRINGL (ItemBuf, 1);
+    RETURN_STRINGL (ItemBuf, ItemLen);
     }
 
 /*
@@ -2341,7 +2377,7 @@ if (ItemPtr->item_type == DATE)
     /*
     ** Return the date/time string
     */
-    RETURN_STRINGL (DateTimeBuf, 1);
+    RETURN_STRING (DateTimeBuf);
     }
 
 /*
@@ -2370,7 +2406,7 @@ if (ItemPtr->item_type == PRIV)
     /*
     ** Return the privilege string
     */
-    RETURN_STRINGL (PrivBuf, 1);
+    RETURN_STRING (PrivBuf);
     }
 
 /*
@@ -2399,7 +2435,7 @@ if (ItemPtr->item_type == RLST)
     /*
     ** Return the privilege string
     */
-    RETURN_STRINGL (RightsBuf, 0);
+    RETURN_STRING (RightsBuf);
     }
 
 /*
@@ -2446,7 +2482,7 @@ if (ItemPtr->item_type == SOGW)
     /*
     ** Return the privilege string
     */
-    RETURN_STRINGL (ProtBuf, 1);
+    RETURN_STRING (ProtBuf);
     }
 
 /*
@@ -2504,7 +2540,7 @@ if (ItemPtr->item_type == UIC)
     /*
     ** Return the system right
     */
-    RETURN_STRINGL (UicName, 1);
+    RETURN_STRING (UicName);
     }
 
 RETURN_FALSE;

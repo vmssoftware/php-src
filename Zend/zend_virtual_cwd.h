@@ -300,6 +300,28 @@ extern void virtual_cwd_main_cwd_init(uint8_t);
 #define VCWD_ACCESS(pathname, mode) tsrm_win32_access(pathname, mode)
 #define VCWD_GETCWD(buff, size) php_win32_ioutil_getcwd(buff, size)
 #define VCWD_CHMOD(path, mode) php_win32_ioutil_chmod(path, mode)
+#elif defined(__VMS)
+#define VCWD_FOPEN(path, mode)  			fopen_vms(path, mode)
+#define VCWD_OPEN(path, flags) 				open_vms(path, flags)
+#define VCWD_OPEN_MODE(path, flags, mode)	open_mode_vms(path, flags, mode)
+#define VCWD_RENAME(oldname, newname) 		rename_vms(oldname, newname)
+#define VCWD_MKDIR(pathname, mode) 			mkdir_vms(pathname, mode)
+#define VCWD_RMDIR(pathname) 				rmdir_vms(pathname)
+#define VCWD_UNLINK(path) 					unlink_vms(path)
+#define VCWD_CHDIR(path) 					chdir_vms(path)
+#define VCWD_ACCESS(pathname, mode) 		access_vms(pathname, mode)
+#define	VCWD_GETCWD(buff, size) 			getcwd(buff, size, 0)
+#define VCWD_CHMOD(path, mode) 				chmod_vms(path, mode)
+extern FILE* fopen_vms(const char *path, const char *mode);
+extern int open_vms(const char *file_spec, int flags);
+extern int open_mode_vms(const char *file_spec, int flags, int mode);
+extern int rename_vms(const char *old_file_spec, const char *new_file_spec);
+extern int mkdir_vms(const char *dir_spec, mode_t mode);
+extern int rmdir_vms(const char *pathname);
+extern int unlink_vms(const char *path);
+extern int chdir_vms(const char* path);
+extern int access_vms(const char *pathname, int mode);
+extern int chmod_vms(const char *path, int mode);
 #else
 #define VCWD_FOPEN(path, mode)  fopen(path, mode)
 #define VCWD_OPEN(path, flags) open(path, flags)
@@ -312,11 +334,6 @@ extern void virtual_cwd_main_cwd_init(uint8_t);
 #define VCWD_ACCESS(pathname, mode) access(pathname, mode)
 #define VCWD_GETCWD(buff, size) getcwd(buff, size)
 #define VCWD_CHMOD(path, mode) chmod(path, mode)
-#endif
-
-#ifdef __VMS
-#	undef 	VCWD_GETCWD
-#	define 	VCWD_GETCWD(buff, size) getcwd(buff, size, 0)
 #endif
 
 #ifdef __VMS

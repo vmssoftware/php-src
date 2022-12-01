@@ -1746,3 +1746,36 @@ CWD_API char *tsrm_realpath(const char *path, char *real_path) /* {{{ */
 	}
 }
 /* }}} */
+
+#ifdef __VMS
+FILE* fopen_vms(const char *path, const char *mode) {
+	return fopen(path, mode);
+}
+int open_vms(const char *path, int flags) {
+	return open(path, flags);
+}
+int open_mode_vms(const char *path, int flags, int mode) {
+	return open(path, flags, mode);
+}
+int rename_vms(const char *old_file_spec, const char *new_file_spec) {
+	return rename(old_file_spec, new_file_spec);
+}
+int mkdir_vms(const char *pathname, mode_t mode) {
+	return mkdir(pathname, mode);
+}
+int rmdir_vms(const char *pathname) {
+	return rmdir(pathname);
+}
+int unlink_vms(const char *path) {
+	return unlink(path);
+}
+int chdir_vms(const char* path) {
+	return chdir(path);
+}
+int access_vms(const char *pathname, int mode) {
+	return access(pathname, mode);
+}
+int chmod_vms(const char *path, int mode) {
+	return chmod(path, mode);
+}
+#endif

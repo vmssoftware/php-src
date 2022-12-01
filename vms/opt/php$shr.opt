@@ -5773,7 +5773,17 @@ SYMBOL_VECTOR = (-
 	virtual_rmdir = PROCEDURE, -
 	virtual_stat = PROCEDURE, -
 	virtual_unlink = PROCEDURE, -
-	virtual_utime = PROCEDURE -
+	virtual_utime = PROCEDURE, -
+	fopen_vms = PROCEDURE, -
+	open_vms = PROCEDURE, -
+	open_mode_vms = PROCEDURE, -
+	rename_vms = PROCEDURE, -
+	mkdir_vms = PROCEDURE, -
+	rmdir_vms = PROCEDURE, -
+	unlink_vms = PROCEDURE, -
+	chdir_vms = PROCEDURE, -
+	access_vms = PROCEDURE, -
+	chmod_vms = PROCEDURE -
 )
 !Module zend_vm_opcodes
 SYMBOL_VECTOR = (-

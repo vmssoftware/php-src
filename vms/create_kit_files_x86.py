@@ -39,7 +39,7 @@ product VSI X86VMS PHP {type}{major}.{minor}-{level}{edit} FULL ;
     execute preconfigure "@pcsi$source:[php]php$pcsi_preconfigure.com" uses [php]php$pcsi_preconfigure.com ;
 
 --
---  Make sure VMS V8.4 or above is installed
+--  Make sure VMS X86_64 V9.2 or above is installed
 --
 --    if ((not <software VSI X86VMS VMS version minimum E9.2>)) ;
 --        error NO_MIN_VMS abort ;
@@ -123,11 +123,11 @@ end product;
 =prompt VSI Software Inc.
 
 1 'NOTICE
-=prompt (C) Copyright 2021 VMS Software Inc.
+=prompt (C) Copyright 2022 VMS Software Inc.
 
 1 NO_MIN_VMS
 =prompt Minimum OpenVMS software version not found on this system, abort instalation
-This kit requires a minimum of OpenVMS I64 V8.4.
+This kit requires a minimum of OpenVMS X86_64 V9.2.
 
 1 NO_ODS5_DISKS
 =prompt ODS-5 disk(s) not found on this system, abort installation
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     major = '8'
     minor = '0'
     level = '0'
-    edit = 'build003'
+    edit = 'build004'
 
     for opt, optarg in opts:
         if opt in ['--type']:

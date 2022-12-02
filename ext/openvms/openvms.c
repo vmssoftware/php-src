@@ -1120,6 +1120,14 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_status, 0, 0, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_trnlnm, 0, 0,  MAY_BE_STRING|MAY_BE_LONG|MAY_BE_BOOL|MAY_BE_NULL)
+    ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, attr, IS_STRING, 1, "NULL")
+    ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, tabnam, IS_STRING, 1, "NULL")
+	ZEND_ARG_TYPE_INFO(0, lognam, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, acmode, IS_STRING, 1, "NULL")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, itmlst, IS_ARRAY, 1, "NULL")
+ZEND_END_ARG_INFO()
+
 const zend_function_entry openvms_functions[] = {
  PHP_FE(openvms_cvt_filename, arginfo_openvms_cvt_filename)
  PHP_FE(openvms_getdvi, arginfo_openvms_getdvi)
@@ -1129,6 +1137,7 @@ const zend_function_entry openvms_functions[] = {
  PHP_FE(openvms_status, arginfo_openvms_status)
  PHP_FE(openvms_time, arginfo_openvms_time)
  PHP_FE(openvms_uptime, arginfo_openvms_uptime)
+ PHP_FE(openvms_trnlnm, arginfo_openvms_trnlnm) 
  PHP_FE_END
 };
 
@@ -2066,6 +2075,46 @@ if (DateTimePtr)
 */
 RETURN_STRING (DateTimeBuf);
 
+}
+/******************************************************************************/
+/***                                                                        ***/
+/******************************************************************************/
+PHP_FUNCTION(openvms_trnlnm) {
+
+    int         status;
+    char*       attr_str = NULL;
+    size_t      attr_len = 0;
+    char*       tabnam_str = NULL;
+    size_t      tabnam_len = 0;
+    char*       lognam_str = NULL;
+    size_t      lognam_len = 0;
+    char*       acmode_str = NULL;
+    size_t      acmode_len = 0;
+    zval*       itmlst = NULL;
+    
+    /*
+    ** Establish a normal status
+    */
+    decc$$translate (SS$_NORMAL);
+
+    printf("\nopenvms_trnlnm: start\n");
+
+    ZEND_PARSE_PARAMETERS_START(0, 5)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_STRING_OR_NULL(attr_str, attr_len)
+        Z_PARAM_STRING_OR_NULL(tabnam_str, tabnam_len)
+        Z_PARAM_STRING(lognam_str, lognam_len)
+        Z_PARAM_STRING_OR_NULL(acmode_str, acmode_len)
+        Z_PARAM_ZVAL_OR_NULL(itmlst)
+    ZEND_PARSE_PARAMETERS_END();
+
+    printf("attr_str=(%p) \"%s\", attr_len=%i\n", attr_str, attr_str, attr_len);
+    printf("tabnam_str=(%p) \"%s\", tabnam_len=%i\n", tabnam_str, tabnam_str, tabnam_len);
+    printf("lognam_str=(%p) \"%s\", lognam_len=%i\n", lognam_str, lognam_str, lognam_len);
+    printf("acmode_str=(%p) \"%s\", acmode_len=%i\n", acmode_str, acmode_str, acmode_len);
+    printf("itmlst=(%p)\n", itmlst);
+
+    RETURN_FALSE;
 }
 
 /******************************************************************************/

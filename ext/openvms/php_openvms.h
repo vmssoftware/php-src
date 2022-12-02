@@ -18,6 +18,7 @@ PHP_FUNCTION(openvms_message);
 PHP_FUNCTION(openvms_status);
 PHP_FUNCTION(openvms_time);
 PHP_FUNCTION(openvms_uptime);
+PHP_FUNCTION(openvms_trnlnm);
 
 #define phpext_openvms_ptr openvms_module_ptr
 

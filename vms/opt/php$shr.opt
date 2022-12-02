@@ -5775,6 +5775,7 @@ SYMBOL_VECTOR = (-
 	virtual_unlink = PROCEDURE, -
 	virtual_utime = PROCEDURE, -
 	fopen_vms = PROCEDURE, -
+	test_vms_file_name = PROCEDURE, -
 	open_vms = PROCEDURE, -
 	open_mode_vms = PROCEDURE, -
 	rename_vms = PROCEDURE, -

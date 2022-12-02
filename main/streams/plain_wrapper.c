@@ -1087,6 +1087,10 @@ PHPAPI php_stream *_php_stream_fopen(const char *filename, const char *mode, zen
 	}
 #ifdef PHP_WIN32
 	fd = php_win32_ioutil_open(realpath, open_flags, 0666);
+#elif defined(__VMS)
+	// why don't we use VCWD_OPEN?
+	extern int open_mode_vms(const char *file_spec, int flags, int mode);
+	fd = open_mode_vms(realpath, open_flags, 0666);
 #else
 	fd = open(realpath, open_flags, 0666);
 #endif

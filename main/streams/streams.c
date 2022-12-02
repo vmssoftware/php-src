@@ -2071,6 +2071,13 @@ PHPAPI php_stream *_php_stream_open_wrapper_ex(const char *path, const char *mod
 		return NULL;
 	}
 
+#ifdef __VMS
+	extern int test_vms_file_name(const char *path);
+	if (test_vms_file_name(path)) {
+		options |= IGNORE_URL | STREAM_ASSUME_REALPATH;
+	}
+#endif
+
 	if (options & USE_PATH) {
 		resolved_path = zend_resolve_path(path, strlen(path));
 		if (resolved_path) {

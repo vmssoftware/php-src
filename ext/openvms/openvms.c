@@ -87,8 +87,6 @@
 #define OPENVMS_CVT_UNIX_TO_VMS 2
 #endif
 
-#define TABNAM_DEF "LNM$FILE_DEV"
-
 #if defined(__VMS) && __INITIAL_POINTER_SIZE == 64
 #   define  set_dsc_string(dsc, val)    \
         (dsc).dsc$a_pointer = alloca(strlen(val)+1);    \
@@ -138,11 +136,11 @@ struct item_code {
 */
 
 struct item_code lnm_items[] = {
-    // these two goes first
+    // INDEX goes first!
     {"INDEX", LNM$_INDEX, LONG, 4 },
-    {"STRING", LNM$_STRING, TEXT, 255 },
-    // 
+    // ATTRIBUTES goes second (before STRING)!
     {"ATTRIBUTES", LNM$_ATTRIBUTES, LONG, 4 },
+    {"STRING", LNM$_STRING, TEXT, 255 },
     {"ACMODE", LNM$_ACMODE, BYTE, 1 },
     {"LENGTH", LNM$_LENGTH, LONG, 4 },
     {"MAX_INDEX", LNM$_MAX_INDEX, LONG, 4 },
@@ -1182,6 +1180,7 @@ const zend_function_entry openvms_functions[] = {
  PHP_FE(openvms_time, arginfo_openvms_time)
  PHP_FE(openvms_uptime, arginfo_openvms_uptime)
  PHP_FE(openvms_trnlnm, arginfo_openvms_trnlnm) 
+ PHP_FE(openvms_crelnm, arginfo_openvms_trnlnm) 
  PHP_FE_END
 };
 
@@ -2120,11 +2119,12 @@ if (DateTimePtr)
 RETURN_STRING (DateTimeBuf);
 
 }
+
 /******************************************************************************/
 /***                                                                        ***/
 /******************************************************************************/
-PHP_FUNCTION(openvms_trnlnm) {
 
+static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
     int         status = SS$_NORMAL;
     char*       attr_str = NULL;
     size_t      attr_len = 0;
@@ -2164,8 +2164,8 @@ PHP_FUNCTION(openvms_trnlnm) {
         pattr = &attr;
     }
 
-    char *tabnam = TABNAM_DEF;
-    size_t tabnam_size = sizeof(TABNAM_DEF) - 1;
+    char *tabnam = create ? "LNM$PROCESS_TABLE" : "LNM$FILE_DEV";
+    size_t tabnam_size = strlen(tabnam);
     if (tabnam_str && tabnam_len) {
         tabnam = tabnam_str;
         tabnam_size = tabnam_len;
@@ -2190,13 +2190,17 @@ PHP_FUNCTION(openvms_trnlnm) {
         plognam_dsc = &lognam_dsc;
     }
 
-    unsigned long lnm_index = 0;
     unsigned long ile3_codes = 1 << LNM$_STRING;    // assume LNM$_STRING is always set
     long ile3_count = 1;
     struct itmlst_parsed {
         int code;
         int bitmask;
     } *itmlst_parsed = NULL;
+
+    // collect values from array
+    unsigned long lnm_index = 0;
+    char *lnm_string = NULL;
+    unsigned long lnm_attributes = 0;
 
     if (itmlst) {
         uint32_t itmlst_len = zend_array_count(Z_ARR_P(itmlst));
@@ -2222,10 +2226,22 @@ PHP_FUNCTION(openvms_trnlnm) {
                         } else if (Z_TYPE_P(val) == IS_STRING) {
                             lnm_index = atoi(Z_STRVAL_P(val));
                         }
+                    } else if (result == LNM$_STRING) {
+                        // save only on create
+                        if (create && Z_TYPE_P(val) == IS_STRING && Z_STRVAL_P(val)) {
+                            int len = strlen(Z_STRVAL_P(val));
+                            if (len > 255) {
+                                len = 255;
+                            }
+                            lnm_string = alloca(len + 1);
+                            strncpy(lnm_string, Z_STRVAL_P(val), len);
+                            lnm_string[len] = 0;
+                        }
                     }
                 } else if (ParseBits(&result, ZSTR_VAL(key), lnm_item_attr, sizeof(lnm_item_attr)/sizeof(lnm_item_attr[0]))) {
                     itmlst_parsed[itmlst_parsed_idx].code = LNM$_ATTRIBUTES;
                     itmlst_parsed[itmlst_parsed_idx].bitmask = result;
+                    lnm_attributes |= result;
                     if (!(ile3_codes & (1 << LNM$_ATTRIBUTES))) {
                         ++ile3_count;
                     }
@@ -2238,25 +2254,49 @@ PHP_FUNCTION(openvms_trnlnm) {
         } ZEND_HASH_FOREACH_END();    
     }
 
+    if (create && !lnm_string) {
+        php_error_docref (NULL TSRMLS_CC, E_WARNING, "lognam value must be present in array");
+        RETURN_FALSE;
+    }
+
     ILE3 *item_list = alloca((ile3_count + 1) * sizeof(ILE3));
     int ile3_idx = 0;
     memset(item_list, 0, (ile3_count + 1) * sizeof(ILE3));
+
     // create item list in the same order as lnm_items
+    // also, put collected from array values
     for(int i = 0; i < sizeof(lnm_items)/sizeof(lnm_items[0]); ++i) {
         if (ile3_codes & (1 << lnm_items[i].item_code)) {
             item_list[ile3_idx].ile3$w_length = lnm_items[i].item_size;
             item_list[ile3_idx].ile3$w_code = lnm_items[i].item_code;
             item_list[ile3_idx].ile3$ps_bufaddr = alloca(lnm_items[i].item_size+1);
             item_list[ile3_idx].ile3$ps_retlen_addr = alloca(sizeof(short));
-            // set index, if it is present. as it already goes first in lnm_items, we should not arrange it at first place
-            if (ile3_codes & (1 << LNM$_INDEX)) {
-                *(long*)item_list[ile3_idx].ile3$ps_bufaddr = lnm_index;
+            switch (lnm_items[i].item_code) {
+                case LNM$_INDEX:
+                    // set index, if it is present. as it already goes first in lnm_items, we should not arrange it at first place
+                    *(long*)item_list[ile3_idx].ile3$ps_bufaddr = lnm_index;
+                    break;
+                case LNM$_ATTRIBUTES:
+                    // set attribute
+                    *(long*)item_list[ile3_idx].ile3$ps_bufaddr = lnm_attributes;
+                    break;
+                case LNM$_STRING:
+                    if (create && lnm_string) {
+                        // set string value only on create
+                        item_list[ile3_idx].ile3$w_length = strlen(lnm_string);
+                        strncpy(item_list[ile3_idx].ile3$ps_bufaddr, lnm_string, item_list[ile3_idx].ile3$w_length);
+                    }
+                    break;
             }
             ++ile3_idx;
         }
     }
 
-    status = sys$trnlnm(pattr, &tabnam_dsc, plognam_dsc, pacmode, item_list);
+    if (create) {
+        status = sys$crelnm(pattr, &tabnam_dsc, plognam_dsc, pacmode, item_list);
+    } else {
+        status = sys$trnlnm(pattr, &tabnam_dsc, plognam_dsc, pacmode, item_list);
+    }
 
     decc$$translate (status);
 
@@ -2309,6 +2349,17 @@ PHP_FUNCTION(openvms_trnlnm) {
         } ZEND_HASH_FOREACH_END();    
     }
     return;
+}
+
+PHP_FUNCTION(openvms_trnlnm) {
+    OpenVMS_LNM(execute_data, return_value, FALSE);
+}
+
+/******************************************************************************/
+/***                                                                        ***/
+/******************************************************************************/
+PHP_FUNCTION(openvms_crelnm) {
+    OpenVMS_LNM(execute_data, return_value, TRUE);
 }
 
 /******************************************************************************/
@@ -3188,7 +3239,6 @@ static int is_like(const char *source, const char *test) {
 }
 
 static int FindToken(const char *source, const char **end, const char *delim, const char** tokens, int length, int stride) {
-    // printf("FindToken: source=\"%s\"\n", source);
     // skip delimiters
     while(*source && is_delim(*source, delim)) {
         ++source;
@@ -3226,7 +3276,6 @@ static int FindToken(const char *source, const char **end, const char *delim, co
  * @result FALSE if some in bits_str is not present in codes
 */
 static int ParseBits(unsigned long *result, const char *bits_str, struct item_code *codes, int codes_len) {
-    // printf("ParseBits: bits_str=\"%s\"\n", bits_str);
     if (!result) {
         return FALSE;
     }
@@ -3234,9 +3283,7 @@ static int ParseBits(unsigned long *result, const char *bits_str, struct item_co
     const char *end = bits_str;
     while(*end) {
         int idx = FindToken(end, &end, " ,|", (const char**)codes, codes_len, sizeof(struct item_code));
-        // printf("ParseBits: FindToken=%i\n", idx);
         if (idx >= 0) {
-            // printf("ParseBits: result|=%x\n", codes[idx].item_code);
             *result |= codes[idx].item_code;
         } else if (idx == -1) {
             // invlid name?

@@ -1122,6 +1122,7 @@ static char *BinToHex (char *, int);
 static char *GetPrivs (PRVDEF *);
 static char *GetIdent (unsigned int);
 static int   ParseBits(unsigned long *result, const char *bits_str, struct item_code *codes, int codes_len);
+static int   FindToken(const char *source, const char **end, const char *delim, const char** tokens, int length, int stride);
 
 extern int decc$$translate ();
 extern EXE$GL_ABSTIM;
@@ -2147,6 +2148,13 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
         Z_PARAM_ZVAL_OR_NULL(itmlst)
     ZEND_PARSE_PARAMETERS_END();
 
+#if 0
+    printf("\nOpenVMS_LNM: %s\n", create ? "create" : "translate");
+    printf("attr_str: \"%s\", %i\n", attr_str, attr_len);
+    printf("tabnam_str: \"%s\", %i\n", tabnam_str, tabnam_len);
+    printf("lognam_str: \"%s\", %i\n", lognam_str, lognam_len);
+    printf("acmode_str: \"%s\", %i\n", acmode_str, acmode_len);
+#endif
 
     if (!lognam_str || !lognam_len) {
         php_error_docref (NULL TSRMLS_CC, E_WARNING, "logname must not be empty");
@@ -2173,8 +2181,28 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
     
     unsigned char acmode = PSL$C_USER, *pacmode = NULL;
     if (acmode_str && acmode_len) {
-        acmode = atoi(acmode_str);
-        pacmode = &acmode;
+        const char *end = acmode_str;
+        static const char * acmodes[] = {
+            "KERNEL",   // 0
+            "EXEC",     // 1
+            "SUPER",    // 2
+            "USER",     // 3
+        };
+        int i_acmode = FindToken(end, &end, "", acmodes, sizeof(acmodes)/sizeof(char*), sizeof(char*));
+    #if 0
+        printf("i_acmode=%i\n", i_acmode);
+    #endif
+        if (i_acmode != -1) {
+            acmode = (unsigned char)i_acmode;
+            pacmode = &acmode;
+        } else {
+            // allow modes 1-3 ?
+            i_acmode = atoi(acmode_str);
+            if (0 < i_acmode && i_acmode < 4 ) {
+                acmode = (unsigned char)i_acmode;
+                pacmode = &acmode;
+            }
+        }
     }
 
     $DESCRIPTOR(tabnam_dsc, "");
@@ -2277,13 +2305,16 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
                     *(long*)item_list[ile3_idx].ile3$ps_bufaddr = lnm_index;
                     break;
                 case LNM$_ATTRIBUTES:
-                    // set attribute
-                    *(long*)item_list[ile3_idx].ile3$ps_bufaddr = lnm_attributes;
+                    if (create) {
+                        // set attribute. on create only. it is before STRING
+                        *(long*)item_list[ile3_idx].ile3$ps_bufaddr = lnm_attributes;
+                    }
                     break;
                 case LNM$_STRING:
                     if (create && lnm_string) {
                         // set string value only on create
                         item_list[ile3_idx].ile3$w_length = strlen(lnm_string);
+                        *(short*)item_list[ile3_idx].ile3$ps_retlen_addr = item_list[ile3_idx].ile3$w_length;
                         strncpy(item_list[ile3_idx].ile3$ps_bufaddr, lnm_string, item_list[ile3_idx].ile3$w_length);
                     }
                     break;
@@ -2291,6 +2322,19 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
             ++ile3_idx;
         }
     }
+
+#if 0
+    printf("ile3_count=%i\n", ile3_count);
+    printf("pattr=%p, 0x%x\n", pattr, pattr ? *pattr : 0);
+    printf("tabnam=\"%.*s\"\n", tabnam_dsc.dsc$w_length, tabnam_dsc.dsc$a_pointer);
+    printf("lognam=\"%.*s\"\n", lognam_dsc.dsc$w_length, lognam_dsc.dsc$a_pointer);
+    for(int i = 0; i < ile3_count; ++i) {
+        printf("\t item_list[%i].ile3$w_code=0x%x\n", i, item_list[i].ile3$w_code);
+        printf("\t item_list[%i].ile3$w_length=%i\n", i, item_list[i].ile3$w_length);
+        printf("\t *(short*)item_list[%i].ile3$ps_retlen_addr)=%i\n", i, *(short*)item_list[i].ile3$ps_retlen_addr);
+        printf("\t *(unsigned long*)item_list[%i].ile3$ps_bufaddr=0x%x\n", i, *(unsigned long*)item_list[i].ile3$ps_bufaddr);
+    }
+#endif
 
     if (create) {
         status = sys$crelnm(pattr, &tabnam_dsc, plognam_dsc, pacmode, item_list);

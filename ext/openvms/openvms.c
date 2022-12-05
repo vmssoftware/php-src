@@ -42,6 +42,8 @@
 #include <efndef.h>
 #include <iledef.h>
 #include <ssdef.h>
+#include <lnmdef.h>
+#include <psldef.h>
 #include "ilemac.h"
 #include "cvtfnm.h"
 #ifdef  __NEW_STARLET_SET
@@ -85,6 +87,16 @@
 #define OPENVMS_CVT_UNIX_TO_VMS 2
 #endif
 
+#define TABNAM_DEF "LNM$FILE_DEV"
+
+#if defined(__VMS) && __INITIAL_POINTER_SIZE == 64
+#   define  set_dsc_string(dsc, val)    \
+        (dsc).dsc$a_pointer = alloca(strlen(val)+1);    \
+        strcpy((dsc).dsc$a_pointer, val);
+#else
+#   define  set_dsc_string(dsc, val)    (dsc).dsc$a_pointer = (__char_ptr32)(val)
+#endif
+
 #define APPEND(str,itm,sep)		\
     if (strlen (str) == 0)		\
         strcat (str, itm);              \
@@ -124,6 +136,37 @@ struct item_code {
 **   compatible with V7.3 and above.  Those compiled against V7.3
 **   are not compatible with V7.2-2.
 */
+
+struct item_code lnm_items[] = {
+    // these two goes first
+    {"INDEX", LNM$_INDEX, LONG, 4 },
+    {"STRING", LNM$_STRING, TEXT, 255 },
+    // 
+    {"ATTRIBUTES", LNM$_ATTRIBUTES, LONG, 4 },
+    {"ACMODE", LNM$_ACMODE, BYTE, 1 },
+    {"LENGTH", LNM$_LENGTH, LONG, 4 },
+    {"MAX_INDEX", LNM$_MAX_INDEX, LONG, 4 },
+    {"PARENT", LNM$_PARENT, TEXT, 31 },
+    {"TABLE_NAME", LNM$_TABLE, TEXT, 31 },
+};
+
+// sorted by second field
+struct item_code lnm_item_attr[] = {
+    { "NO_ALIAS", LNM$M_NO_ALIAS, BYTE, 1 },
+    { "CONFINE", LNM$M_CONFINE, BYTE, 1 },
+    { "CRELOG", LNM$M_CRELOG, BYTE, 1 },
+    { "TABLE", LNM$M_TABLE, BYTE, 1 },
+    { "CONCEALED", LNM$M_CONCEALED, BYTE, 1 },
+    { "TERMINAL", LNM$M_TERMINAL, BYTE, 1 },
+    { "EXISTS", LNM$M_EXISTS, BYTE, 1 },
+    { "SHAREABLE", LNM$M_SHAREABLE, BYTE, 1 },
+    { "CLUSTERWIDE", LNM$M_CLUSTERWIDE, BYTE, 1 },
+    { "DCL_REQUEST", LNM$M_DCL_REQUEST, BYTE, 1 },
+    { "CREATE_IF", LNM$M_CREATE_IF, BYTE, 1 },
+    { "CASE_BLIND", LNM$M_CASE_BLIND, BYTE, 1 },
+    { "INTERLOCKED", LNM$M_INTERLOCKED, BYTE, 1 },
+    { "LOCAL_ACTION", LNM$M_LOCAL_ACTION, BYTE, 1 },
+};
 
 struct item_code dvi_items[] = {
  {"ACPPID", DVI$_ACPPID, BYTE, 4},
@@ -1080,6 +1123,7 @@ static char *GetDateTime (__int64 *);
 static char *BinToHex (char *, int);
 static char *GetPrivs (PRVDEF *);
 static char *GetIdent (unsigned int);
+static int   ParseBits(unsigned long *result, const char *bits_str, struct item_code *codes, int codes_len);
 
 extern int decc$$translate ();
 extern EXE$GL_ABSTIM;
@@ -2081,7 +2125,7 @@ RETURN_STRING (DateTimeBuf);
 /******************************************************************************/
 PHP_FUNCTION(openvms_trnlnm) {
 
-    int         status;
+    int         status = SS$_NORMAL;
     char*       attr_str = NULL;
     size_t      attr_len = 0;
     char*       tabnam_str = NULL;
@@ -2092,12 +2136,7 @@ PHP_FUNCTION(openvms_trnlnm) {
     size_t      acmode_len = 0;
     zval*       itmlst = NULL;
     
-    /*
-    ** Establish a normal status
-    */
-    decc$$translate (SS$_NORMAL);
-
-    printf("\nopenvms_trnlnm: start\n");
+    decc$$translate (status);
 
     ZEND_PARSE_PARAMETERS_START(0, 5)
         Z_PARAM_OPTIONAL
@@ -2108,13 +2147,168 @@ PHP_FUNCTION(openvms_trnlnm) {
         Z_PARAM_ZVAL_OR_NULL(itmlst)
     ZEND_PARSE_PARAMETERS_END();
 
-    printf("attr_str=(%p) \"%s\", attr_len=%i\n", attr_str, attr_str, attr_len);
-    printf("tabnam_str=(%p) \"%s\", tabnam_len=%i\n", tabnam_str, tabnam_str, tabnam_len);
-    printf("lognam_str=(%p) \"%s\", lognam_len=%i\n", lognam_str, lognam_str, lognam_len);
-    printf("acmode_str=(%p) \"%s\", acmode_len=%i\n", acmode_str, acmode_str, acmode_len);
-    printf("itmlst=(%p)\n", itmlst);
 
-    RETURN_FALSE;
+    if (!lognam_str || !lognam_len) {
+        php_error_docref (NULL TSRMLS_CC, E_WARNING, "logname must not be empty");
+        RETURN_FALSE;
+    }
+
+    unsigned int attr = 0, *pattr = NULL;
+    if (attr_str && attr_len) {
+        unsigned long result = 0;
+        if (!ParseBits(&result, attr_str, lnm_item_attr, sizeof(lnm_item_attr)/sizeof(lnm_item_attr[0]))) {
+            php_error_docref (NULL TSRMLS_CC, E_WARNING, "invalid attr value %s", attr_str);
+            RETURN_FALSE;
+        }
+        attr = (unsigned int)result;
+        pattr = &attr;
+    }
+
+    char *tabnam = TABNAM_DEF;
+    size_t tabnam_size = sizeof(TABNAM_DEF) - 1;
+    if (tabnam_str && tabnam_len) {
+        tabnam = tabnam_str;
+        tabnam_size = tabnam_len;
+    }
+    
+    unsigned char acmode = PSL$C_USER, *pacmode = NULL;
+    if (acmode_str && acmode_len) {
+        acmode = atoi(acmode_str);
+        pacmode = &acmode;
+    }
+
+    $DESCRIPTOR(tabnam_dsc, "");
+    $DESCRIPTOR(lognam_dsc, "");
+    __void_ptr32 plognam_dsc = NULL;
+
+    tabnam_dsc.dsc$w_length = tabnam_size;
+    set_dsc_string(tabnam_dsc, tabnam);
+
+    if (lognam_str && lognam_len) {
+        lognam_dsc.dsc$w_length = lognam_len;
+        set_dsc_string(lognam_dsc, lognam_str);
+        plognam_dsc = &lognam_dsc;
+    }
+
+    unsigned long lnm_index = 0;
+    unsigned long ile3_codes = 1 << LNM$_STRING;    // assume LNM$_STRING is always set
+    long ile3_count = 1;
+    struct itmlst_parsed {
+        int code;
+        int bitmask;
+    } *itmlst_parsed = NULL;
+
+    if (itmlst) {
+        uint32_t itmlst_len = zend_array_count(Z_ARR_P(itmlst));
+        itmlst_parsed = (struct itmlst_parsed*)alloca(itmlst_len * sizeof(struct itmlst_parsed));
+        memset(itmlst_parsed, 0, itmlst_len * sizeof(struct itmlst_parsed));
+        zend_ulong idx;
+        zend_string *key;
+        zval *val;
+        int itmlst_parsed_idx = 0;
+        ZEND_HASH_FOREACH_KEY_VAL(Z_ARR_P(itmlst), idx, key, val) {
+            if (key) {
+                unsigned long result = 0;
+                if (ParseBits(&result, ZSTR_VAL(key), lnm_items, sizeof(lnm_items)/sizeof(lnm_items[0]))) {
+                    itmlst_parsed[itmlst_parsed_idx].code = result;
+                    if (!(ile3_codes & (1 << result))) {
+                        ++ile3_count;
+                    }
+                    ile3_codes |= 1 << result;
+                    // special case for LNM$_INDEX, we should get its value
+                    if (result == LNM$_INDEX) {
+                        if (Z_TYPE_P(val) == IS_LONG) {
+                            lnm_index = Z_LVAL_P(val);
+                        } else if (Z_TYPE_P(val) == IS_STRING) {
+                            lnm_index = atoi(Z_STRVAL_P(val));
+                        }
+                    }
+                } else if (ParseBits(&result, ZSTR_VAL(key), lnm_item_attr, sizeof(lnm_item_attr)/sizeof(lnm_item_attr[0]))) {
+                    itmlst_parsed[itmlst_parsed_idx].code = LNM$_ATTRIBUTES;
+                    itmlst_parsed[itmlst_parsed_idx].bitmask = result;
+                    if (!(ile3_codes & (1 << LNM$_ATTRIBUTES))) {
+                        ++ile3_count;
+                    }
+                    ile3_codes |= 1 << LNM$_ATTRIBUTES;
+                } else {
+                    itmlst_parsed[itmlst_parsed_idx].code = -1;
+                }
+                ++itmlst_parsed_idx;
+            }
+        } ZEND_HASH_FOREACH_END();    
+    }
+
+    ILE3 *item_list = alloca((ile3_count + 1) * sizeof(ILE3));
+    int ile3_idx = 0;
+    memset(item_list, 0, (ile3_count + 1) * sizeof(ILE3));
+    // create item list in the same order as lnm_items
+    for(int i = 0; i < sizeof(lnm_items)/sizeof(lnm_items[0]); ++i) {
+        if (ile3_codes & (1 << lnm_items[i].item_code)) {
+            item_list[ile3_idx].ile3$w_length = lnm_items[i].item_size;
+            item_list[ile3_idx].ile3$w_code = lnm_items[i].item_code;
+            item_list[ile3_idx].ile3$ps_bufaddr = alloca(lnm_items[i].item_size+1);
+            item_list[ile3_idx].ile3$ps_retlen_addr = alloca(sizeof(short));
+            // set index, if it is present. as it already goes first in lnm_items, we should not arrange it at first place
+            if (ile3_codes & (1 << LNM$_INDEX)) {
+                *(long*)item_list[ile3_idx].ile3$ps_bufaddr = lnm_index;
+            }
+            ++ile3_idx;
+        }
+    }
+
+    status = sys$trnlnm(pattr, &tabnam_dsc, plognam_dsc, pacmode, item_list);
+
+    decc$$translate (status);
+
+    RETVAL_FALSE;
+    if (status != SS$_NORMAL) {
+        return;
+    }
+    
+    // set result
+    for(int i = 0; i < ile3_count; ++i) {
+        if (item_list[i].ile3$w_code == LNM$_STRING) {
+            char *str = (char*)item_list[i].ile3$ps_bufaddr;
+            str[*item_list[i].ile3$ps_retlen_addr] = 0;
+            RETVAL_STRING(str);
+            break;
+        }
+    }
+    // fill itmlst
+    if (itmlst) {
+        zend_ulong idx;
+        zend_string *key;
+        zval *val;
+        int itmlst_parsed_idx = 0;
+        ZEND_HASH_FOREACH_KEY_VAL(Z_ARR_P(itmlst), idx, key, val) {
+            if (key) {
+                if (itmlst_parsed[itmlst_parsed_idx].code != -1) {
+                    for(int i = 0; i < ile3_count; ++i) {
+                        if (item_list[i].ile3$w_code == itmlst_parsed[itmlst_parsed_idx].code) {
+                            if (itmlst_parsed[itmlst_parsed_idx].code == LNM$_ATTRIBUTES) {
+                                if (*(unsigned long*)item_list[i].ile3$ps_bufaddr & itmlst_parsed[itmlst_parsed_idx].bitmask) {
+                                    ZVAL_TRUE(val);
+                                } else {
+                                    ZVAL_FALSE(val);
+                                }
+                            } else {
+                                for(int j = 0; j < sizeof(lnm_items)/sizeof(lnm_items[0]); ++j) {
+                                    if (lnm_items[j].item_code == item_list[i].ile3$w_code) {
+                                        FormatItemData(val, &lnm_items[j], item_list[i].ile3$ps_bufaddr, *(short*)item_list[i].ile3$ps_retlen_addr);
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        zend_hash_add(Z_ARR_P(itmlst), key, val);
+                    }
+                }
+                ++itmlst_parsed_idx;
+            }
+        } ZEND_HASH_FOREACH_END();    
+    }
+    return;
 }
 
 /******************************************************************************/
@@ -2970,4 +3164,84 @@ if (! (status & 1))
 
 return (MaxRads);
 
+}
+
+/******************************************************************************/
+/***                                                                        ***/
+/******************************************************************************/
+static int is_delim(char source, const char* delim) {
+    if (!source) { 
+        return TRUE;
+    }
+    while(*delim && source != *delim) {
+        ++delim;
+    }
+    return (0 != *delim);
+}
+
+static int is_like(const char *source, const char *test) {
+    while(*source && *test && tolower((unsigned char)*source) == tolower((unsigned char)*test)) {
+        ++source;
+        ++test;
+    }
+    return 0 == *test;
+}
+
+static int FindToken(const char *source, const char **end, const char *delim, const char** tokens, int length, int stride) {
+    // printf("FindToken: source=\"%s\"\n", source);
+    // skip delimiters
+    while(*source && is_delim(*source, delim)) {
+        ++source;
+    }
+    if (!*source) {
+        if (end) {
+            *end = source;
+        }
+        return -2;
+    } else {
+        // find 
+        for(int i = 0; i < length; ++i) {
+            if (is_like(source, *tokens)) {
+                if (end) {
+                    *end = source + strlen(*tokens);
+                }
+                return i;
+            }
+            tokens = (const char**)(((char*)tokens) + stride);
+        }
+        if (end) {
+            // skip this token
+            while(*source && !is_delim(*source, delim)) {
+                ++source;
+            }
+            *end = source;
+        }
+        return -1;
+    }
+}
+
+/**
+ * Parse bits_str and fill result
+ * @param result combination of bits from codes[idx].item_code, if codes[idx].item_name is present in bits_str
+ * @result FALSE if some in bits_str is not present in codes
+*/
+static int ParseBits(unsigned long *result, const char *bits_str, struct item_code *codes, int codes_len) {
+    // printf("ParseBits: bits_str=\"%s\"\n", bits_str);
+    if (!result) {
+        return FALSE;
+    }
+    *result = 0;
+    const char *end = bits_str;
+    while(*end) {
+        int idx = FindToken(end, &end, " ,|", (const char**)codes, codes_len, sizeof(struct item_code));
+        // printf("ParseBits: FindToken=%i\n", idx);
+        if (idx >= 0) {
+            // printf("ParseBits: result|=%x\n", codes[idx].item_code);
+            *result |= codes[idx].item_code;
+        } else if (idx == -1) {
+            // invlid name?
+            return FALSE;
+        }
+    }
+    return TRUE;
 }

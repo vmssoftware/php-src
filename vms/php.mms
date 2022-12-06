@@ -205,7 +205,6 @@ PHP_MODULES = -
 [.$(OUT_DIR)]openvms.exe -
 [.$(OUT_DIR)]bz2.exe -
 [.$(OUT_DIR)]odbc.exe -
-- ! [.$(OUT_DIR)]wddx.exe
 [.$(OUT_DIR)]xsl.exe -
 [.$(OUT_DIR)]opcache.exe -
 [.$(OUT_DIR)]sysvsem.exe -

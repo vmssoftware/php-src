@@ -20,6 +20,10 @@ PHP_FUNCTION(openvms_time);
 PHP_FUNCTION(openvms_uptime);
 PHP_FUNCTION(openvms_trnlnm);
 PHP_FUNCTION(openvms_crelnm);
+PHP_FUNCTION(openvms_dellnm);
+PHP_FUNCTION(openvms_symbol_set);
+PHP_FUNCTION(openvms_symbol_get);
+PHP_FUNCTION(openvms_symbol_delete);
 
 #define phpext_openvms_ptr openvms_module_ptr
 

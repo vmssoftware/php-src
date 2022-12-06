@@ -44,6 +44,8 @@
 #include <ssdef.h>
 #include <lnmdef.h>
 #include <psldef.h>
+#include <libdef.h>
+#include <libclidef.h>
 #include "ilemac.h"
 #include "cvtfnm.h"
 #ifdef  __NEW_STARLET_SET
@@ -142,6 +144,7 @@ struct item_code lnm_items[] = {
     {"ATTRIBUTES", LNM$_ATTRIBUTES, LONG, 4 },
     {"STRING", LNM$_STRING, TEXT, 255 },
     {"ACMODE", LNM$_ACMODE, BYTE, 1 },
+    {"ACCESS_MODE", LNM$_ACMODE, BYTE, 1 },
     {"LENGTH", LNM$_LENGTH, LONG, 4 },
     {"MAX_INDEX", LNM$_MAX_INDEX, LONG, 4 },
     {"PARENT", LNM$_PARENT, TEXT, 31 },
@@ -1123,6 +1126,7 @@ static char *GetPrivs (PRVDEF *);
 static char *GetIdent (unsigned int);
 static int   ParseBits(unsigned long *result, const char *bits_str, struct item_code *codes, int codes_len);
 static int   FindToken(const char *source, const char **end, const char *delim, const char** tokens, int length, int stride);
+static int   ParseAcmode(const char* acmode_str);
 
 extern int decc$$translate ();
 extern EXE$GL_ABSTIM;
@@ -1171,6 +1175,24 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_trnlnm, 0, 0,  MAY_BE_ST
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, itmlst, IS_ARRAY, 1, "NULL")
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_dellnm, 0, 1, MAY_BE_BOOL)
+    ZEND_ARG_TYPE_INFO(0, tabnam, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, lognam, IS_STRING, 1, "NULL")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, acmode, IS_STRING, 1, "NULL")
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_symbol_set, 0, 2, MAY_BE_BOOL)
+    ZEND_ARG_TYPE_INFO(0, symbol_name, IS_STRING, 0)
+    ZEND_ARG_TYPE_INFO(0, symbol_value, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, true_if_global, _IS_BOOL, 1, "false")
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_openvms_symbol_get, 0, 1, MAY_BE_STRING|MAY_BE_BOOL)
+    ZEND_ARG_TYPE_INFO(0, symbol_name, IS_STRING, 0)
+    ZEND_ARG_TYPE_MASK(0, true_if_global, MAY_BE_BOOL|MAY_BE_NULL, NULL)
+	//ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, true_if_global, _IS_BOOL, 1, "null")
+ZEND_END_ARG_INFO()
+
 const zend_function_entry openvms_functions[] = {
  PHP_FE(openvms_cvt_filename, arginfo_openvms_cvt_filename)
  PHP_FE(openvms_getdvi, arginfo_openvms_getdvi)
@@ -1182,6 +1204,10 @@ const zend_function_entry openvms_functions[] = {
  PHP_FE(openvms_uptime, arginfo_openvms_uptime)
  PHP_FE(openvms_trnlnm, arginfo_openvms_trnlnm) 
  PHP_FE(openvms_crelnm, arginfo_openvms_trnlnm) 
+ PHP_FE(openvms_dellnm, arginfo_openvms_dellnm) 
+ PHP_FE(openvms_symbol_set, arginfo_openvms_symbol_set) 
+ PHP_FE(openvms_symbol_get, arginfo_openvms_symbol_get) 
+ PHP_FE(openvms_symbol_delete, arginfo_openvms_symbol_get) 
  PHP_FE_END
 };
 
@@ -2181,27 +2207,10 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
     
     unsigned char acmode = PSL$C_USER, *pacmode = NULL;
     if (acmode_str && acmode_len) {
-        const char *end = acmode_str;
-        static const char * acmodes[] = {
-            "KERNEL",   // 0
-            "EXEC",     // 1
-            "SUPER",    // 2
-            "USER",     // 3
-        };
-        int i_acmode = FindToken(end, &end, "", acmodes, sizeof(acmodes)/sizeof(char*), sizeof(char*));
-    #if 0
-        printf("i_acmode=%i\n", i_acmode);
-    #endif
+        int i_acmode = ParseAcmode(acmode_str);
         if (i_acmode != -1) {
             acmode = (unsigned char)i_acmode;
             pacmode = &acmode;
-        } else {
-            // allow modes 1-3 ?
-            i_acmode = atoi(acmode_str);
-            if (0 < i_acmode && i_acmode < 4 ) {
-                acmode = (unsigned char)i_acmode;
-                pacmode = &acmode;
-            }
         }
     }
 
@@ -2406,6 +2415,227 @@ PHP_FUNCTION(openvms_crelnm) {
     OpenVMS_LNM(execute_data, return_value, TRUE);
 }
 
+/******************************************************************************/
+/***                                                                        ***/
+/******************************************************************************/
+PHP_FUNCTION(openvms_dellnm) {
+    int         status = SS$_NORMAL;
+    char*       tabnam_str = NULL;
+    size_t      tabnam_len = 0;
+    char*       lognam_str = NULL;
+    size_t      lognam_len = 0;
+    char*       acmode_str = NULL;
+    size_t      acmode_len = 0;
+    
+    decc$$translate (status);
+
+    ZEND_PARSE_PARAMETERS_START(1, 3)
+        Z_PARAM_STRING_OR_NULL(tabnam_str, tabnam_len)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_STRING_OR_NULL(lognam_str, lognam_len)
+        Z_PARAM_STRING_OR_NULL(acmode_str, acmode_len)
+    ZEND_PARSE_PARAMETERS_END();
+
+#if 0
+    printf("tabnam_str: \"%s\", %i\n", tabnam_str, tabnam_len);
+    printf("lognam_str: \"%s\", %i\n", lognam_str, lognam_len);
+    printf("acmode_str: \"%s\", %i\n", acmode_str, acmode_len);
+#endif
+
+    if (!tabnam_str || !tabnam_len) {
+        php_error_docref (NULL TSRMLS_CC, E_WARNING, "tabnam must not be empty");
+        RETURN_FALSE;
+    }
+
+    unsigned char acmode = PSL$C_USER, *pacmode = NULL;
+    if (acmode_str && acmode_len) {
+        int i_acmode = ParseAcmode(acmode_str);
+        if (i_acmode != -1) {
+            acmode = (unsigned char)i_acmode;
+            pacmode = &acmode;
+        }
+    }
+
+    $DESCRIPTOR(tabnam_dsc, "");
+    $DESCRIPTOR(lognam_dsc, "");
+    __void_ptr32 plognam_dsc = NULL;
+
+    tabnam_dsc.dsc$w_length = tabnam_len;
+    set_dsc_string(tabnam_dsc, tabnam_str);
+
+    if (lognam_str && lognam_len) {
+        lognam_dsc.dsc$w_length = lognam_len;
+        set_dsc_string(lognam_dsc, lognam_str);
+        plognam_dsc = &lognam_dsc;
+    }
+
+    status = sys$dellnm(&tabnam_dsc, plognam_dsc, pacmode);
+
+    decc$$translate (status);
+
+    if (status != SS$_NORMAL) {
+        RETURN_FALSE;
+    }
+    RETURN_TRUE;
+}
+
+/******************************************************************************/
+/***                                                                        ***/
+/******************************************************************************/
+PHP_FUNCTION(openvms_symbol_set) {
+    int         status = SS$_NORMAL;
+    char*       symbol_name_str = NULL;
+    size_t      symbol_name_len = 0;
+    char*       symbol_value_str = NULL;
+    size_t      symbol_value_len = 0;
+    zend_bool   true_if_global = 0;
+    
+    decc$$translate (status);
+
+    ZEND_PARSE_PARAMETERS_START(2, 3)
+        Z_PARAM_STRING_OR_NULL(symbol_name_str, symbol_name_len)
+        Z_PARAM_STRING_OR_NULL(symbol_value_str, symbol_value_len)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_BOOL(true_if_global)
+    ZEND_PARSE_PARAMETERS_END();
+
+#if 0
+    printf("openvms_symbol_set\n");
+    printf("symbol_name_str: \"%s\", %i\n", symbol_name_str, symbol_name_len);
+    printf("symbol_value_str: \"%s\", %i\n", symbol_value_str, symbol_value_len);
+    printf("true_if_global: %i\n", true_if_global);
+#endif
+
+    if (!symbol_name_str || !symbol_name_len) {
+        php_error_docref (NULL TSRMLS_CC, E_WARNING, "symbol_name must not be empty");
+        RETURN_FALSE;
+    }
+
+    if (!symbol_value_str || !symbol_value_len) {
+        php_error_docref (NULL TSRMLS_CC, E_WARNING, "symbol_value must not be empty");
+        RETURN_FALSE;
+    }
+
+    $DESCRIPTOR(symbol_name_dsc, "");
+    $DESCRIPTOR(symbol_value_dsc, "");
+
+    symbol_name_dsc.dsc$w_length = symbol_name_len;
+    set_dsc_string(symbol_name_dsc, symbol_name_str);
+
+    symbol_value_dsc.dsc$w_length = symbol_value_len;
+    set_dsc_string(symbol_value_dsc, symbol_value_str);
+
+    long table_type_indicator = true_if_global ? LIB$K_CLI_GLOBAL_SYM : LIB$K_CLI_LOCAL_SYM;
+    status = LIB$SET_SYMBOL(&symbol_name_dsc, &symbol_value_dsc, &table_type_indicator);
+
+    decc$$translate (status);
+
+    if (status != SS$_NORMAL) {
+        RETURN_FALSE;
+    }
+    RETURN_TRUE;
+}
+
+/******************************************************************************/
+/***                                                                        ***/
+/******************************************************************************/
+PHP_FUNCTION(openvms_symbol_get) {
+    int         status = SS$_NORMAL;
+    char*       symbol_name_str = NULL;
+    size_t      symbol_name_len = 0;
+    zend_bool   true_if_global = 0;
+    zend_bool   true_if_global_is_null = TRUE;
+    
+    decc$$translate (status);
+
+    ZEND_PARSE_PARAMETERS_START(1, 2)
+        Z_PARAM_STRING_OR_NULL(symbol_name_str, symbol_name_len)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_BOOL_OR_NULL(true_if_global, true_if_global_is_null)
+    ZEND_PARSE_PARAMETERS_END();
+
+#if 0
+    printf("openvms_symbol_get\n");
+    printf("symbol_name_str: \"%s\", %i\n", symbol_name_str, symbol_name_len);
+    printf("true_if_global: %i, %i\n", true_if_global, true_if_global_is_null);
+#endif
+
+    if (!symbol_name_str || !symbol_name_len) {
+        php_error_docref (NULL TSRMLS_CC, E_WARNING, "symbol_name must not be empty");
+        RETURN_FALSE;
+    }
+
+    $DESCRIPTOR(symbol_name_dsc, "");
+    $DESCRIPTOR(symbol_value_dsc, "");
+
+    symbol_name_dsc.dsc$w_length = symbol_name_len;
+    set_dsc_string(symbol_name_dsc, symbol_name_str);
+
+    symbol_value_dsc.dsc$w_length = 255;
+    symbol_value_dsc.dsc$a_pointer = alloca(256);
+
+    long table_type_indicator = 0;
+    short result_len = 0;
+    status = LIB$GET_SYMBOL(&symbol_name_dsc, &symbol_value_dsc, &result_len, &table_type_indicator);
+
+    if (!true_if_global_is_null &&
+        ((table_type_indicator == LIB$K_CLI_LOCAL_SYM && true_if_global) ||
+         (table_type_indicator == LIB$K_CLI_GLOBAL_SYM && !true_if_global))) {
+        status = LIB$_NOSUCHSYM;
+    }
+
+    decc$$translate (status);
+
+    if (status != SS$_NORMAL) {
+        RETURN_FALSE;
+    }
+    RETURN_STRINGL(symbol_value_dsc.dsc$a_pointer, result_len);
+}
+
+/******************************************************************************/
+/***                                                                        ***/
+/******************************************************************************/
+PHP_FUNCTION(openvms_symbol_delete) {
+    int         status = SS$_NORMAL;
+    char*       symbol_name_str = NULL;
+    size_t      symbol_name_len = 0;
+    zend_bool   true_if_global = 0;
+    
+    decc$$translate (status);
+
+    ZEND_PARSE_PARAMETERS_START(1, 2)
+        Z_PARAM_STRING_OR_NULL(symbol_name_str, symbol_name_len)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_BOOL(true_if_global)
+    ZEND_PARSE_PARAMETERS_END();
+
+#if 0
+    printf("openvms_symbol_delete\n");
+    printf("symbol_name_str: \"%s\", %i\n", symbol_name_str, symbol_name_len);
+    printf("true_if_global: %i\n", true_if_global);
+#endif
+
+    if (!symbol_name_str || !symbol_name_len) {
+        php_error_docref (NULL TSRMLS_CC, E_WARNING, "symbol_name must not be empty");
+        RETURN_FALSE;
+    }
+
+    $DESCRIPTOR(symbol_name_dsc, "");
+
+    symbol_name_dsc.dsc$w_length = symbol_name_len;
+    set_dsc_string(symbol_name_dsc, symbol_name_str);
+
+    long table_type_indicator = true_if_global ? LIB$K_CLI_GLOBAL_SYM : LIB$K_CLI_LOCAL_SYM;
+    status = LIB$DELETE_SYMBOL(&symbol_name_dsc, &table_type_indicator);
+
+    decc$$translate (status);
+
+    if (status != SS$_NORMAL) {
+        RETURN_FALSE;
+    }
+    RETURN_TRUE;
+}
+
 /******************************************************************************/
 /***                                                                        ***/
 /******************************************************************************/
@@ -3264,6 +3494,34 @@ return (MaxRads);
 /******************************************************************************/
 /***                                                                        ***/
 /******************************************************************************/
+
+static const char *acmodes[] = {
+    "KERNEL",   // 0
+    "EXEC",     // 1
+    "SUPER",    // 2
+    "USER",     // 3
+};
+
+/**
+ * Parses acmode_str
+ * @return acmode [0-3] or -1
+*/
+static int ParseAcmode(const char* acmode_str) {
+    const char *end = acmode_str;
+    int i_acmode = FindToken(end, &end, "", acmodes, sizeof(acmodes)/sizeof(char*), sizeof(char*));
+#if 0
+    printf("i_acmode=%i\n", i_acmode);
+#endif
+    if (i_acmode != -1) {
+        return i_acmode;
+    }
+    // allow modes 1-3 ?
+    i_acmode = atoi(acmode_str);
+    if (0 < i_acmode && i_acmode < 4 ) {
+        return i_acmode;
+    }
+    return -1;
+}
 static int is_delim(char source, const char* delim) {
     if (!source) { 
         return TRUE;

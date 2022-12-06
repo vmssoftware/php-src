@@ -242,19 +242,31 @@ echo "<br>\n";
 #   openvms_symbol_delete(symbol_name [, true_if_global]);
 #
 echo "openvms_symbol_set('BLAH_1',date('Y-m-d'));<br>\n";
- openvms_symbol_set('BLAH_1',date('Y-m-d'));
+$val = openvms_symbol_set('BLAH_1',date('Y-m-d'));
+if ($val === FALSE)
+    echo openvms_message (openvms_status ());
 echo "openvms_symbol_set('BLAH_2','TWO');<br>\n";
- openvms_symbol_set('BLAH_2','TWO');
+$val = openvms_symbol_set('BLAH_2','TWO');
+if ($val === FALSE)
+    echo openvms_message (openvms_status ());
 echo "openvms_symbol_set('BLAH_3',date('h:m:s'),true);<br>\n";
- openvms_symbol_set('BLAH_3',date('h:m:s'),true);
+$val = openvms_symbol_set('BLAH_3',date('h:m:s'),true);
+if ($val === FALSE)
+    echo openvms_message (openvms_status ());
 echo "openvms_symbol_set('BLAH_4','global-4',true);>br>\n";
- openvms_symbol_set('BLAH_4','global-4',true);
+$val = openvms_symbol_set('BLAH_4','global-4',true);
+if ($val === FALSE)
+    echo openvms_message (openvms_status ());
 echo "BLAH_4 = openvms_symbol_get('BLAH_4') = " . openvms_symbol_get('BLAH_4') . "<br>\n";
 echo "BLAH_4 (local) = openvms_symbol_get('BLAH_4',false) = " . openvms_symbol_get('BLAH_4',false) . "<br>\n";
 echo "BLAH_4 (global) = openvms_symbol_get('BLAH_4',true) = " . openvms_symbol_get('BLAH_4',true) . "<br>\n";
 
-  openvms_symbol_delete('BLAH_2');
-  openvms_symbol_delete('BLAH_4',true);
+$val = openvms_symbol_delete('BLAH_2');
+if ($val === FALSE)
+  echo openvms_message (openvms_status ());
+$val = openvms_symbol_delete('BLAH_4',true);
+if ($val === FALSE)
+    echo openvms_message (openvms_status ());
 
 echo "<br>\n";
 

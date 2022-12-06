@@ -144,10 +144,23 @@ struct item_code lnm_items[] = {
     {"ATTRIBUTES", LNM$_ATTRIBUTES, LONG, 4 },
     {"STRING", LNM$_STRING, TEXT, 255 },
     {"ACMODE", LNM$_ACMODE, BYTE, 1 },
-    {"ACCESS_MODE", LNM$_ACMODE, BYTE, 1 },
     {"LENGTH", LNM$_LENGTH, LONG, 4 },
     {"MAX_INDEX", LNM$_MAX_INDEX, LONG, 4 },
     {"PARENT", LNM$_PARENT, TEXT, 31 },
+    {"TABLE_NAME", LNM$_TABLE, TEXT, 31 },
+};
+
+// this is created only for parsing 
+// because previous lnm_items cannot have more than one elements with the same code
+struct item_code lnm_items_for_parsing[] = {
+    {"ACCESS_MODE", LNM$_ACMODE, BYTE, 1 },
+    {"ACMODE", LNM$_ACMODE, BYTE, 1 },
+    {"ATTRIBUTES", LNM$_ATTRIBUTES, LONG, 4 },
+    {"INDEX", LNM$_INDEX, LONG, 4 },
+    {"LENGTH", LNM$_LENGTH, LONG, 4 },
+    {"MAX_INDEX", LNM$_MAX_INDEX, LONG, 4 },
+    {"PARENT", LNM$_PARENT, TEXT, 31 },
+    {"STRING", LNM$_STRING, TEXT, 255 },
     {"TABLE_NAME", LNM$_TABLE, TEXT, 31 },
 };
 
@@ -2250,7 +2263,10 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
         ZEND_HASH_FOREACH_KEY_VAL(Z_ARR_P(itmlst), idx, key, val) {
             if (key) {
                 unsigned long result = 0;
-                if (ParseBits(&result, ZSTR_VAL(key), lnm_items, sizeof(lnm_items)/sizeof(lnm_items[0]))) {
+                if (ParseBits(&result, ZSTR_VAL(key), lnm_items_for_parsing, sizeof(lnm_items_for_parsing)/sizeof(lnm_items_for_parsing[0]))) {
+            #if 0
+                    printf("ParseBits for \"%s\"=%x\n", ZSTR_VAL(key), result);
+            #endif
                     itmlst_parsed[itmlst_parsed_idx].code = result;
                     if (!(ile3_codes & (1 << result))) {
                         ++ile3_count;
@@ -2276,6 +2292,9 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
                         }
                     }
                 } else if (ParseBits(&result, ZSTR_VAL(key), lnm_item_attr, sizeof(lnm_item_attr)/sizeof(lnm_item_attr[0]))) {
+            #if 0
+                    printf("ParseBits for \"%s\"= attribute %x\n", ZSTR_VAL(key), result);
+            #endif
                     itmlst_parsed[itmlst_parsed_idx].code = LNM$_ATTRIBUTES;
                     itmlst_parsed[itmlst_parsed_idx].bitmask = result;
                     lnm_attributes |= result;
@@ -2333,6 +2352,7 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
     }
 
 #if 0
+    printf("before call\n");
     printf("ile3_count=%i\n", ile3_count);
     printf("pattr=%p, 0x%x\n", pattr, pattr ? *pattr : 0);
     printf("tabnam=\"%.*s\"\n", tabnam_dsc.dsc$w_length, tabnam_dsc.dsc$a_pointer);
@@ -2350,6 +2370,20 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
     } else {
         status = sys$trnlnm(pattr, &tabnam_dsc, plognam_dsc, pacmode, item_list);
     }
+
+#if 0
+    printf("after call\n");
+    printf("ile3_count=%i\n", ile3_count);
+    printf("pattr=%p, 0x%x\n", pattr, pattr ? *pattr : 0);
+    printf("tabnam=\"%.*s\"\n", tabnam_dsc.dsc$w_length, tabnam_dsc.dsc$a_pointer);
+    printf("lognam=\"%.*s\"\n", lognam_dsc.dsc$w_length, lognam_dsc.dsc$a_pointer);
+    for(int i = 0; i < ile3_count; ++i) {
+        printf("\t item_list[%i].ile3$w_code=0x%x\n", i, item_list[i].ile3$w_code);
+        printf("\t item_list[%i].ile3$w_length=%i\n", i, item_list[i].ile3$w_length);
+        printf("\t *(short*)item_list[%i].ile3$ps_retlen_addr)=%i\n", i, *(short*)item_list[i].ile3$ps_retlen_addr);
+        printf("\t *(unsigned long*)item_list[%i].ile3$ps_bufaddr=0x%x\n", i, *(unsigned long*)item_list[i].ile3$ps_bufaddr);
+    }
+#endif
 
     decc$$translate (status);
 
@@ -2394,7 +2428,6 @@ static void OpenVMS_LNM(INTERNAL_FUNCTION_PARAMETERS, int create) {
                             }
                             break;
                         }
-                        zend_hash_add(Z_ARR_P(itmlst), key, val);
                     }
                 }
                 ++itmlst_parsed_idx;

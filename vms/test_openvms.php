@@ -32,7 +32,7 @@ table.lnm td {
 # Load the OpenVMS extension if needed
 #
 if (! extension_loaded ("openvms"))
-    dl ("php_openvms");
+    dl ("openvms.exe");
 
 #
 # Display the header
@@ -53,7 +53,7 @@ error_reporting (E_ERROR);
 #	OPENVMS_CVT_VMS_TO_UNIX		Convert vms filespec to unix filespec
 #	OPENVMS_CVT_UNIX_TO_VMS		Convert unix filespec to vms filespec
 #
-$VmsFn = "PHP_ROOT:[SCRIPTS]PHP_OPENVMS.PHP";
+$VmsFn = "PHP\$ROOT:[etc]php.ini";
 $UnixFn = openvms_cvt_filename (OPENVMS_CVT_VMS_TO_UNIX, $VmsFn);
 if ($UnixFn === FALSE)
     echo "openvms_cvt_filename (OPENVMS_CVT_VMS_TO_UNIX, \"$VmsFn\") = <b>" . openvms_message (openvms_status ()) . "</b><br>\n";

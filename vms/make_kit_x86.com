@@ -3,15 +3,15 @@ $
 $ delete/log/noconf vsi-i64vms-php-*.pcsi;*
 $ delete/log/noconf vsi-i64vms-php-*.pcsi$compressed;*
 $
-$ ! material is the parent folder for php$root 
-$ ! for example if php$root is WORK:[VORFOLOMEEV.PHP.]
-$ ! then material must be WORK:[VORFOLOMEEV.]
-$ ! NOTE: php$root must ends with PHP
+$ com_nam = f$environment("procedure")
+$ com_dir = f$parse(com_nam,,,"directory")
+$ com_dev = f$parse(com_nam,,,"device")
+$ out_pat = com_dev + com_dir - "vms]" + "out.]"
 $
 $ product package php -
         /source=php.pcsi$desc -
         /destination=[] -
-        /material=(WORK:[VORFOLOMEEV.]) -
+        /material=('out_pat') -
         /format=sequential -
         /opt=noconf -
         /log -
